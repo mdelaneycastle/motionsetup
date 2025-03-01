@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighting Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .light-status {
+            margin: 10px;
+            font-size: 20px;
+        }
+        .button {
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        const piIp = "http://172.17.67.100:5000";
+
+        function updateStatus(lightNumber) {
+            fetch(`${piIp}/status${lightNumber}`)
+                .then(response => response.text())
+                .then(status => {
+                    document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
+                })
+                .catch(() => {
+                    document.getElementById(`statusText${lightNumber}`).innerText = "Status: Error";
+                });
+        }
+
+        function toggleLight(lightNumber) {
+            fetch(`${piIp}/toggle${lightNumber}`)
+                .then(() => updateStatus(lightNumber));
+        }
+
+        function playVideo() {
+            fetch(`${piIp}/play_video`);
+        }
+
+        function stopVideo() {
+            fetch(`${piIp}/stop_video`);
+        }
+
+        function toggleAndPlay() {
+            fetch(`${piIp}/toggle_and_play`);
+        }
+
+        window.onload = function() {
+            updateStatus(1);
+            updateStatus(2);
+            updateStatus(3);
+            updateStatus(4);
+        }
+    </script>
+</head>
+<body>
+    <h1>Lighting and Video Control</h1>
+    
+    <div class="light-status" id="statusText1">Light 1: OFF</div>
+    <button class="button" onclick="toggleLight(1)">Toggle Light 1</button>
+    
+    <div class="light-status" id="statusText2">Light 2: OFF</div>
+    <button class="button" onclick="toggleLight(2)">Toggle Light 2</button>
+    
+    <div class="light-status" id="statusText3">Light 3: OFF</div>
+    <button class="button" onclick="toggleLight(3)">Toggle Light 3</button>
+    
+    <div class="light-status" id="statusText4">Light 4: OFF</div>
+    <button class="button" onclick="toggleLight(4)">Toggle Light 4</button>
+
+    <button class="button" onclick="playVideo()">Play Video</button>
+    <button class="button" onclick="stopVideo()">Stop Video</button>
+    <button class="button" onclick="toggleAndPlay()">Toggle and Play Video</button>
+</body>
+</html>
