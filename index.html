@@ -23,6 +23,26 @@
             cursor: pointer;
         }
     </style>
+</head>
+<body>
+    <h1>Lighting and Video Control.</h1>
+    
+    <div class="light-status" id="statusText1">Light 1: OFF</div>
+    <button class="button" onclick="toggleLight(1)">Toggle Light 1</button>
+    
+    <div class="light-status" id="statusText2">Light 2: OFF</div>
+    <button class="button" onclick="toggleLight(2)">Toggle Light 2</button>
+    
+    <div class="light-status" id="statusText3">Light 3: OFF</div>
+    <button class="button" onclick="toggleLight(3)">Toggle Light 3</button>
+    
+    <div class="light-status" id="statusText4">Light 4: OFF</div>
+    <button class="button" onclick="toggleLight(4)">Toggle Light 4</button>
+
+    <button class="button" onclick="playVideo()">Play Video</button>
+    <button class="button" onclick="stopVideo()">Stop Video</button>
+    <button class="button" onclick="toggleAndPlay()">Toggle and Play Video</button>
+
     <script>
         const piIp = "https://api.marcosismotion.co.uk";
 
@@ -54,31 +74,18 @@
             fetch(`${piIp}/toggle_and_play`);
         }
 
-        window.onload = function() {
+        function updateAllStatuses() {
             updateStatus(1);
             updateStatus(2);
             updateStatus(3);
             updateStatus(4);
         }
-    </script>
-</head>
-<body>
-    <h1>Lighting and Video Control</h1>
-    
-    <div class="light-status" id="statusText1">Light 1: OFF</div>
-    <button class="button" onclick="toggleLight(1)">Toggle Light 1</button>
-    
-    <div class="light-status" id="statusText2">Light 2: OFF</div>
-    <button class="button" onclick="toggleLight(2)">Toggle Light 2</button>
-    
-    <div class="light-status" id="statusText3">Light 3: OFF</div>
-    <button class="button" onclick="toggleLight(3)">Toggle Light 3</button>
-    
-    <div class="light-status" id="statusText4">Light 4: OFF</div>
-    <button class="button" onclick="toggleLight(4)">Toggle Light 4</button>
 
-    <button class="button" onclick="playVideo()">Play Video</button>
-    <button class="button" onclick="stopVideo()">Stop Video</button>
-    <button class="button" onclick="toggleAndPlay()">Toggle and Play Video</button>
+        // Automatically update statuses every 2 seconds
+        setInterval(updateAllStatuses, 2000);
+
+        // Update once on page load
+        window.onload = updateAllStatuses;
+    </script>
 </body>
 </html>
