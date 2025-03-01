@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lighting Control</title>
+    <title>Lighting and Motion Control</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,8 +25,9 @@
     </style>
 </head>
 <body>
-    <h1>Lighting and Video Control.</h1>
+    <h1>Lighting and Motion Control</h1>
     
+    <!-- Light Controls -->
     <div class="light-status" id="statusText1">Light 1: OFF</div>
     <button class="button" onclick="toggleLight(1)">Toggle Light 1</button>
     
@@ -39,9 +40,14 @@
     <div class="light-status" id="statusText4">Light 4: OFF</div>
     <button class="button" onclick="toggleLight(4)">Toggle Light 4</button>
 
+    <!-- Video Controls -->
     <button class="button" onclick="playVideo()">Play Video</button>
     <button class="button" onclick="stopVideo()">Stop Video</button>
     <button class="button" onclick="toggleAndPlay()">Toggle and Play Video</button>
+
+    <!-- Motion Sensor Controls -->
+    <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
+    <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
 
     <script>
         const piIp = "https://api.marcosismotion.co.uk";
@@ -74,11 +80,34 @@
             fetch(`${piIp}/toggle_and_play`);
         }
 
+        function toggleMotion() {
+            fetch(`${piIp}/toggle_motion`)
+                .then(response => response.text())
+                .then(status => {
+                    document.getElementById("motionStatus").innerText = `Motion Sensor: ${status}`;
+                })
+                .catch(() => {
+                    document.getElementById("motionStatus").innerText = "Motion Sensor: Error";
+                });
+        }
+
+        function updateMotionStatus() {
+            fetch(`${piIp}/motion_status`)
+                .then(response => response.text())
+                .then(status => {
+                    document.getElementById("motionStatus").innerText = `Motion Sensor: ${status}`;
+                })
+                .catch(() => {
+                    document.getElementById("motionStatus").innerText = "Motion Sensor: Error";
+                });
+        }
+
         function updateAllStatuses() {
             updateStatus(1);
             updateStatus(2);
             updateStatus(3);
             updateStatus(4);
+            updateMotionStatus();
         }
 
         // Automatically update statuses every 2 seconds
