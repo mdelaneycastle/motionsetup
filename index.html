@@ -14,40 +14,40 @@
             margin: 10px;
             font-size: 20px;
         }
-        .button {
-            display: block;
-            width: 200px;
-            margin: 10px auto;
-            padding: 10px;
-            font-size: 18px;
+        .light-button {
+            width: 100px;
             cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .light-off {
+            opacity: 0.4;
         }
     </style>
 </head>
 <body>
     <h1>Lighting and Motion Control</h1>
-    
+
     <!-- Light Controls -->
     <div class="light-status" id="statusText1">Light 1: OFF</div>
-    <button class="button" onclick="toggleLight(1)">Toggle Light 1</button>
-    
+    <img id="light1" class="light-button light-off" src="BCN1.png" alt="Light 1" onclick="toggleLight(1)">
+
     <div class="light-status" id="statusText2">Light 2: OFF</div>
-    <button class="button" onclick="toggleLight(2)">Toggle Light 2</button>
-    
+    <img id="light2" class="light-button light-off" src="BCN2.png" alt="Light 2" onclick="toggleLight(2)">
+
     <div class="light-status" id="statusText3">Light 3: OFF</div>
-    <button class="button" onclick="toggleLight(3)">Toggle Light 3</button>
-    
+    <img id="light3" class="light-button light-off" src="BCN3.png" alt="Light 3" onclick="toggleLight(3)">
+
     <div class="light-status" id="statusText4">Light 4: OFF</div>
-    <button class="button" onclick="toggleLight(4)">Toggle Light 4</button>
+    <img id="light4" class="light-button light-off" src="BCN4.png" alt="Light 4" onclick="toggleLight(4)">
 
     <!-- Video Controls -->
-    <button class="button" onclick="playVideo()">Play Video</button>
-    <button class="button" onclick="stopVideo()">Stop Video</button>
-    <button class="button" onclick="toggleAndPlay()">Toggle and Play Video</button>
+    <button onclick="playVideo()">Play Video</button>
+    <button onclick="stopVideo()">Stop Video</button>
+    <button onclick="toggleAndPlay()">Toggle and Play Video</button>
 
     <!-- Motion Sensor Controls -->
     <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
-    <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
+    <button onclick="toggleMotion()">Toggle Motion Sensor</button>
 
     <script>
         const piIp = "https://api.marcosismotion.co.uk";
@@ -56,7 +56,13 @@
             fetch(`${piIp}/status${lightNumber}`)
                 .then(response => response.text())
                 .then(status => {
+                    const lightElement = document.getElementById(`light${lightNumber}`);
                     document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
+                    if (status === "ON") {
+                        lightElement.classList.remove("light-off");
+                    } else {
+                        lightElement.classList.add("light-off");
+                    }
                 })
                 .catch(() => {
                     document.getElementById(`statusText${lightNumber}`).innerText = "Status: Error";
