@@ -3,51 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lighting and Motion Control</title>
+    <title>Lighting and Motion Control.</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
         }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .light-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0;
+        }
         .light-status {
-            margin: 10px;
             font-size: 20px;
+            margin-bottom: 5px;
         }
         .light-button {
-            width: 100px;
+            width: 120px;
             cursor: pointer;
             transition: opacity 0.3s;
+            border: 2px solid #000;
+            border-radius: 8px;
         }
         .light-off {
             opacity: 0.4;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .button {
+            width: 220px;
+            padding: 12px;
+            margin: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: 1px solid black;
+            background-color: #f0f0f0;
+        }
+        .motion-container {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <h1>Lighting and Motion Control</h1>
+    
+    <div class="container">
+        <!-- Light Controls -->
+        <div class="light-container">
+            <div class="light-status" id="statusText1">Light 1: OFF</div>
+            <img id="light1" class="light-button light-off" src="BCN1.png" alt="Light 1" onclick="toggleLight(1)">
+        </div>
 
-    <!-- Light Controls -->
-    <div class="light-status" id="statusText1">Light 1: OFF</div>
-    <img id="light1" class="light-button light-off" src="BCN1.png" alt="Light 1" onclick="toggleLight(1)">
+        <div class="light-container">
+            <div class="light-status" id="statusText2">Light 2: OFF</div>
+            <img id="light2" class="light-button light-off" src="BCN2.png" alt="Light 2" onclick="toggleLight(2)">
+        </div>
 
-    <div class="light-status" id="statusText2">Light 2: OFF</div>
-    <img id="light2" class="light-button light-off" src="BCN2.png" alt="Light 2" onclick="toggleLight(2)">
+        <div class="light-container">
+            <div class="light-status" id="statusText3">Light 3: OFF</div>
+            <img id="light3" class="light-button light-off" src="BCN3.png" alt="Light 3" onclick="toggleLight(3)">
+        </div>
 
-    <div class="light-status" id="statusText3">Light 3: OFF</div>
-    <img id="light3" class="light-button light-off" src="BCN3.png" alt="Light 3" onclick="toggleLight(3)">
+        <div class="light-container">
+            <div class="light-status" id="statusText4">Light 4: OFF</div>
+            <img id="light4" class="light-button light-off" src="BCN4.png" alt="Light 4" onclick="toggleLight(4)">
+        </div>
 
-    <div class="light-status" id="statusText4">Light 4: OFF</div>
-    <img id="light4" class="light-button light-off" src="BCN4.png" alt="Light 4" onclick="toggleLight(4)">
+        <!-- Video Controls -->
+        <div class="controls">
+            <button class="button" onclick="playVideo()">Play Video</button>
+            <button class="button" onclick="stopVideo()">Stop Video</button>
+            <button class="button" onclick="toggleAndPlay()">Toggle and Play Video</button>
+        </div>
 
-    <!-- Video Controls -->
-    <button onclick="playVideo()">Play Video</button>
-    <button onclick="stopVideo()">Stop Video</button>
-    <button onclick="toggleAndPlay()">Toggle and Play Video</button>
-
-    <!-- Motion Sensor Controls -->
-    <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
-    <button onclick="toggleMotion()">Toggle Motion Sensor</button>
+        <!-- Motion Sensor Controls -->
+        <div class="motion-container">
+            <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
+            <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
+        </div>
+    </div>
 
     <script>
         const piIp = "https://api.marcosismotion.co.uk";
