@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Lighting and Motion Control</h1>
+    <h1>Lighting and Motion Control.</h1>
     
     <div class="container">
         <!-- Light Controls -->
@@ -106,9 +106,9 @@
     <script>
         const piIp = "https://api.marcosismotion.co.uk";
 
-        let jumpTimes = [5, 10, 15, 20, 25]; // Default values, updated via API
+let jumpTimes = [5, 10, 15, 20, 25]; // Default values, updated via API
 
-    function fetchJumpTimes() {
+function fetchJumpTimes() {
     fetch(`${piIp}/get_jump_times`)
         .then(response => {
             if (!response.ok) {
@@ -118,7 +118,7 @@
         })
         .then(data => {
             console.log("Fetched Jump Times:", data); // Debugging log
-            jumpTimes = data.jump_times || [5, 10, 15, 20]; // Fallback values if API fails
+            jumpTimes = data.jump_times || [5, 10, 15, 20, 25]; // Fallback values
             updateJumpButtons();
         })
         .catch(error => console.error("Error fetching jump times:", error));
@@ -127,10 +127,10 @@
 function updateJumpButtons() {
     console.log("Updating Jump Buttons with:", jumpTimes); // Debugging log
 
-    document.getElementById("jump1").onclick = function() { jumpToTime(jumpTimes[0], 1); };
-    document.getElementById("jump2").onclick = function() { jumpToTime(jumpTimes[1], 2); };
-    document.getElementById("jump3").onclick = function() { jumpToTime(jumpTimes[2], 3); };
-    document.getElementById("jump4").onclick = function() { jumpToTime(jumpTimes[3], 4); };
+    document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0], 1); };
+    document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1], 2); };
+    document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2], 3); };
+    document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3], 4); };
 }
 
 function jumpToTime(timeInSeconds, lightNumber) {
@@ -141,95 +141,79 @@ function jumpToTime(timeInSeconds, lightNumber) {
         .catch(error => console.error("Error:", error));
 }
 
-window.onload = function() {
+function updateStatus(lightNumber) {
+    fetch(`${piIp}/status${lightNumber}`)
+        .then(response => response.text())
+        .then(status => {
+            const lightElement = document.getElementById(`light${lightNumber}`);
+            document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
+            if (status === "ON") {
+                lightElement.classList.remove("light-off");
+            } else {
+                lightElement.classList.add("light-off");
+            }
+        })
+        .catch(() => {
+            document.getElementById(`statusText${lightNumber}`).innerText = "Status: Error";
+        });
+}
+
+function toggleLight(lightNumber) {
+    fetch(`${piIp}/toggle${lightNumber}`)
+        .then(() => updateStatus(lightNumber));
+}
+
+function playVideo() {
+    fetch(`${piIp}/play_video`);
+}
+
+function stopVideo() {
+    fetch(`${piIp}/stop_video`);
+}
+
+function toggleAndPlay() {
+    fetch(`${piIp}/toggle_and_play`);
+}
+
+function toggleMotion() {
+    fetch(`${piIp}/toggle_motion`)
+        .then(response => response.text())
+        .then(status => {
+            document.getElementById("motionStatus").innerText = `Motion Sensor: ${status}`;
+        })
+        .catch(() => {
+            document.getElementById("motionStatus").innerText = "Motion Sensor: Error";
+        });
+}
+
+function updateMotionStatus() {
+    fetch(`${piIp}/motion_status`)
+        .then(response => response.text())
+        .then(status => {
+            document.getElementById("motionStatus").innerText = `Motion Sensor: ${status}`;
+        })
+        .catch(() => {
+            document.getElementById("motionStatus").innerText = "Motion Sensor: Error";
+        });
+}
+
+function updateAllStatuses() {
+    updateStatus(1);
+    updateStatus(2);
+    updateStatus(3);
+    updateStatus(4);
+    updateMotionStatus();
+}
+
+// 🛠 Ensure everything runs correctly on page load
+window.onload = function () {
     console.log("Page Loaded: Fetching Jump Times");
     fetchJumpTimes();
     updateAllStatuses();
 };
 
-    function jumpToTime(timeInSeconds, lightNumber) {
-        fetch(`${piIp}/jump_to_time?time=${timeInSeconds}&light=${lightNumber}`)
-            .then(() => updateStatus(lightNumber));
-    }
-
-    window.onload = fetchJumpTimes;
-
-        function updateStatus(lightNumber) {
-            fetch(`${piIp}/status${lightNumber}`)
-                .then(response => response.text())
-                .then(status => {
-                    const lightElement = document.getElementById(`light${lightNumber}`);
-                    document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
-                    if (status === "ON") {
-                        lightElement.classList.remove("light-off");
-                    } else {
-                        lightElement.classList.add("light-off");
-                    }
-                })
-                .catch(() => {
-                    document.getElementById(`statusText${lightNumber}`).innerText = "Status: Error";
-                });
-        }
-
-        function toggleLight(lightNumber) {
-            fetch(`${piIp}/toggle${lightNumber}`)
-                .then(() => updateStatus(lightNumber));
-        }
-
-        function playVideo() {
-            fetch(`${piIp}/play_video`);
-        }
-
-        function stopVideo() {
-            fetch(`${piIp}/stop_video`);
-        }
-
-        function toggleAndPlay() {
-            fetch(`${piIp}/toggle_and_play`);
-        }
-
-        function toggleMotion() {
-            fetch(`${piIp}/toggle_motion`)
-                .then(response => response.text())
-                .then(status => {
-                    document.getElementById("motionStatus").innerText = `Motion Sensor: ${status}`;
-                })
-                .catch(() => {
-                    document.getElementById("motionStatus").innerText = "Motion Sensor: Error";
-                });
-        }
-
-        function updateMotionStatus() {
-            fetch(`${piIp}/motion_status`)
-                .then(response => response.text())
-                .then(status => {
-                    document.getElementById("motionStatus").innerText = `Motion Sensor: ${status}`;
-                })
-                .catch(() => {
-                    document.getElementById("motionStatus").innerText = "Motion Sensor: Error";
-                });
-        }
-
-        function updateAllStatuses() {
-            updateStatus(1);
-            updateStatus(2);
-            updateStatus(3);
-            updateStatus(4);
-            updateMotionStatus();
-        }
-
-        function jumpToTime(timeInSeconds, lightNumber) {
-    fetch(`${piIp}/jump_to_time?time=${timeInSeconds}&light=${lightNumber}`)
-        .then(response => response.text())
-        .then(data => console.log(data))
-        .catch(error => console.error("Error:", error));
-}
-
-        // Automatically update statuses every 2 seconds
-        setInterval(updateAllStatuses, 2000);
-
-        // Update once on page load
-        window.onload = updateAllStatuses;
+// Automatically update statuses every 2 seconds
+setInterval(updateAllStatuses, 2000);
     </script>
 </body>
 </html>
