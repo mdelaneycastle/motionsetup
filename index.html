@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Lighting and Motion Control</h1>
+    <h1>Lighting and Motion Control.</h1>
     
     <div class="container">
         <!-- Light Controls -->
@@ -109,19 +109,14 @@
 let jumpTimes = [5, 10, 15, 20, 25]; // Default values, updated via API
 
 function fetchJumpTimes() {
-    fetch(`${piIp}/get_jump_times?nocache=${Date.now()}`)  // Force fresh data by adding a timestamp
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
+    fetch(`${piIp}/get_jump_times`)
+        .then(response => response.json())
         .then(data => {
-            console.log("✅ Fetched Video Jump Times:", data); // Debugging log
-            jumpTimes = data.jump_times || [5, 10, 15, 20]; // Fallback values
-            updateJumpButtons();  // 🔥 Update buttons IMMEDIATELY
+            console.log("Fetched Jump Times:", data);
+            jumpTimes = data.jump_times;  // ✅ Ensure update
+            updateJumpButtons();  // ✅ Reassign button clicks
         })
-        .catch(error => console.error("❌ Error fetching jump times:", error));
+        .catch(error => console.error("Error fetching jump times:", error));
 }
 
 function updateJumpButtons() {
