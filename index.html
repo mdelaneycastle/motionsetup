@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Lighting and Motion Control.</h1>
+    <h1>Lighting and Motion Control</h1>
     
     <div class="container">
         <!-- Light Controls -->
@@ -117,8 +117,8 @@ function fetchJumpTimes() {
             return response.json();
         })
         .then(data => {
-            console.log("Fetched Jump Times:", data); // Debugging log
-            jumpTimes = data.jump_times || [5, 10, 15, 20, 25]; // Fallback values
+            console.log("Fetched Video Jump Times:", data); // Debugging log
+            jumpTimes = data.jump_times || [5, 10, 15, 20]; // Fallback values
             updateJumpButtons();
         })
         .catch(error => console.error("Error fetching jump times:", error));
