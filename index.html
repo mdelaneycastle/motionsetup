@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Lighting and Motion Control</h1>
+    <h1>Lighting and Motion Control.</h1>
     
     <div class="container">
         <!-- Light Controls -->
@@ -110,13 +110,20 @@ let jumpTimes = [5, 10, 15, 20, 25]; // Default values, updated via API
 
 function fetchJumpTimes() {
     fetch(`${piIp}/get_jump_times`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json(); // Try to parse JSON only if it's a valid response
+        })
         .then(data => {
             console.log("Fetched Jump Times:", data);
-            jumpTimes = data.jump_times;  // ✅ Ensure update
-            updateJumpButtons();  // ✅ Reassign button clicks
+            jumpTimes = data.jump_times;
+            updateJumpButtons();
         })
-        .catch(error => console.error("Error fetching jump times:", error));
+        .catch(error => {
+            console.error("Error fetching jump times:", error);
+        });
 }
 
 function updateJumpButtons() {
