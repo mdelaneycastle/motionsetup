@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Lighting and Motion Control</h1>
+    <h1>Lighting and Motion Control.</h1>
     
     <div class="container">
         <!-- Light Controls -->
@@ -168,7 +168,10 @@ function playVideo() {
 }
 
 function stopVideo() {
-    fetch(`${piIp}/stop_video`);
+    fetch(`${piIp}/stop_video`)
+        .then(() => {
+            updateAllStatuses(); // ✅ Ensure lights turn back ON
+        });
 }
 
 function toggleAndPlay() {
