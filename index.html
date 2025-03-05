@@ -222,12 +222,7 @@ function updateAllStatuses() {
     updateMotionStatus();
 }
 
-// 🛠 Ensure everything runs correctly on page load
-window.onload = function () {
-    console.log("Page Loaded: Fetching Jump Times");
-    fetchJumpTimes();
-    updateAllStatuses();
-};
+
 
 // Automatically update statuses every 2 seconds
 setInterval(updateAllStatuses, 2000);
