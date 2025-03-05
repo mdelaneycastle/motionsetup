@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Lighting and Motion Control.</h1>
+    <h1>Lighting and Motion Control</h1>
     
     <div class="container">
         <!-- Light Controls -->
@@ -122,10 +122,22 @@ function fetchJumpTimes() {
 function updateJumpButtons() {
     console.log("🔄 Updating Jump Buttons with:", jumpTimes); // Debugging log
 
-    document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0], 1); };
-    document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1], 2); };
-    document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2], 3); };
-    document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3], 4); };
+    document.getElementById("jump1").onclick = function () { 
+        console.log(`Clicked Button 1 -> Jumping to ${jumpTimes[0]}`);
+        jumpToTime(jumpTimes[0], 1);
+    };
+    document.getElementById("jump2").onclick = function () { 
+        console.log(`Clicked Button 2 -> Jumping to ${jumpTimes[1]}`);
+        jumpToTime(jumpTimes[1], 2);
+    };
+    document.getElementById("jump3").onclick = function () { 
+        console.log(`Clicked Button 3 -> Jumping to ${jumpTimes[2]}`);
+        jumpToTime(jumpTimes[2], 3);
+    };
+    document.getElementById("jump4").onclick = function () { 
+        console.log(`Clicked Button 4 -> Jumping to ${jumpTimes[3]}`);
+        jumpToTime(jumpTimes[3], 4);
+    };
 }
 
 // 🔥 Ensure `fetchJumpTimes()` runs BEFORE updating buttons
