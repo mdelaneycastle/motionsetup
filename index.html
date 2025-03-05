@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lighting and Motion Control</title>
+    <title>Lighting and Motion Control.</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -170,11 +170,12 @@
             updateMotionStatus();
         }
 
-        // Jump to specific time in video and activate corresponding light
         function jumpToTime(timeInSeconds, lightNumber) {
-            fetch(`${piIp}/jump_to_time?time=${timeInSeconds}&light=${lightNumber}`)
-                .then(() => updateStatus(lightNumber));
-        }
+    fetch(`${piIp}/jump_to_time?time=${timeInSeconds}&light=${lightNumber}`)
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch(error => console.error("Error:", error));
+}
 
         // Automatically update statuses every 2 seconds
         setInterval(updateAllStatuses, 2000);
