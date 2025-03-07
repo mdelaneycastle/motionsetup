@@ -15,11 +15,16 @@
             flex-direction: column;
             align-items: center;
         }
+        .light-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
         .light-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 10px 0;
         }
         .light-status {
             font-size: 20px;
@@ -51,50 +56,48 @@
         .motion-container {
             margin-top: 20px;
         }
-        .jump-controls {
-            margin-top: 20px;
-        }
+        
     </style>
 </head>
 <body>
     <h1>Lighting and Motion Control.</h1>
     
     <div class="container">
+        <div class="light-row">
         <!-- Light Controls -->
         <div class="light-container">
             <div class="light-status" id="statusText1">Light 1: OFF</div>
             <img id="light1" class="light-button light-off" src="BCN2.png" alt="Light 1" onclick="toggleLight(1)">
+            <button class="button" id="jump1">1-2-3</button>
+            
         </div>
 
         <div class="light-container">
             <div class="light-status" id="statusText2">Light 2: OFF</div>
             <img id="light2" class="light-button light-off" src="BCN4.png" alt="Light 2" onclick="toggleLight(2)">
+             <button class="button" id="jump2">Wheeeeee!</button>
         </div>
 
         <div class="light-container">
             <div class="light-status" id="statusText3">Light 3: OFF</div>
             <img id="light3" class="light-button light-off" src="BCN1.png" alt="Light 3" onclick="toggleLight(3)">
+             <button class="button" id="jump3">Silence</button>
         </div>
 
         <div class="light-container">
             <div class="light-status" id="statusText4">Light 4: OFF</div>
             <img id="light4" class="light-button light-off" src="BCN3.png" alt="Light 4" onclick="toggleLight(4)">
+            <button class="button" id="jump4">Waiting</button>
         </div>
 
         <!-- Video Controls -->
         <div class="controls">
-            <button class="button" onclick="playVideo()">Play Video</button>
             <button class="button" onclick="stopVideo()">Stop Video</button>
-            <button class="button" onclick="toggleAndPlay()">Toggle and Play Video</button>
+            <button class="button" onclick="toggleAndPlay()">Light Sequence and Video</button>
         </div>
 
-        <!-- Jump to Scene Controls -->
-        <div class="jump-controls">
-    <button class="button" id="jump1">1-2-3</button>
-    <button class="button" id="jump2">Wheeeeee!</button>
-    <button class="button" id="jump3">Silence</button>
-    <button class="button" id="jump4">Waiting</button>
-</div>
+        
+  
 
         <!-- Motion Sensor Controls -->
         <div class="motion-container">
