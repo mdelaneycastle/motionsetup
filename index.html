@@ -166,53 +166,68 @@
     </div>
 
     <script>
-        const piIp = "https://api.marcosismotion.co.uk";
+    const piIp = "https://api.marcosismotion.co.uk";
 
-        function checkLogin() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
+    function checkLogin() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
 
-            if (username === "admin" && password === "admin") {
-                document.getElementById("loginOverlay").style.display = "none";
-                document.getElementById("mainContent").classList.remove("blurred-background");
+        if (username === "admin" && password === "admin") {
+            document.getElementById("loginOverlay").style.display = "none";
+            document.getElementById("mainContent").classList.remove("blurred-background");
 
-                console.log("🚀 Logged in! Fetching jump times & updating statuses...");
-                fetchJumpTimes();
-                updateAllStatuses();
-            } else {
-                document.getElementById("errorMessage").style.display = "block";
-            }
+            console.log("🚀 Logged in! Fetching jump times & updating statuses...");
+            fetchJumpTimes();
+            updateAllStatuses(); // ✅ Fixed: This function now exists
+        } else {
+            document.getElementById("errorMessage").style.display = "block";
         }
+    }
 
-        function fetchJumpTimes() {
-            fetch(`${piIp}/get_jump_times`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log("✅ Jump times fetched:", data);
-                    jumpTimes = data.jump_times;
-                    updateJumpButtons();
-                })
-                .catch(error => console.error("❌ Error fetching jump times:", error));
-        }
+    function fetchJumpTimes() {
+        fetch(`${piIp}/get_jump_times`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("✅ Jump times fetched:", data);
+                jumpTimes = data.jump_times;
+                updateJumpButtons();
+            })
+            .catch(error => console.error("❌ Error fetching jump times:", error));
+    }
 
-        function updateJumpButtons() {
-            document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0], 1); };
-            document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1], 2); };
-            document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2], 3); };
-            document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3], 4); };
-        }
+    function updateJumpButtons() {
+        document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0], 1); };
+        document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1], 2); };
+        document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2], 3); };
+        document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3], 4); };
+    }
 
-        function jumpToTime(time, lightNumber) {
-            fetch(`${piIp}/jump_to_time?time=${time}&light=${lightNumber}`)
-                .then(response => response.text())
-                .then(data => console.log("📡 Jump Response:", data))
-                .catch(error => console.error("❌ Error:", error));
-        }
+    function jumpToTime(time, lightNumber) {
+        fetch(`${piIp}/jump_to_time?time=${time}&light=${lightNumber}`)
+            .then(response => response.text())
+            .then(data => console.log("📡 Jump Response:", data))
+            .catch(error => console.error("❌ Error:", error));
+    }
 
-        function stopVideo() {
-            fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
+    function updateStatus(lightNumber) {
+        fetch(`${piIp}/status${lightNumber}`)
+            .then(response => response.text())
+            .then(status => {
+                document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
+            });
+    }
+
+    function updateAllStatuses() {
+        console.log("🔄 Updating all statuses...");
+        for (let i = 1; i <= 4; i++) {
+            updateStatus(i);
         }
-    </script>
+    }
+
+    function stopVideo() {
+        fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
+    }
+</script>
 
 </body>
 </html>
