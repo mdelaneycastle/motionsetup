@@ -141,13 +141,32 @@
                     <img id="light2" class="light-button light-off" src="BCN4.png" alt="Light 2" onclick="toggleLight(2)">
                     <button class="button" id="jump2">Wheeeeee!</button>
                 </div>
+                <div class="light-container">
+                    <div class="light-status" id="statusText3">Light 3: OFF</div>
+                    <img id="light3" class="light-button light-off" src="BCN1.png" alt="Light 3" onclick="toggleLight(3)">
+                    <button class="button" id="jump3">Silence</button>
+                </div>
+                <div class="light-container">
+                    <div class="light-status" id="statusText4">Light 4: OFF</div>
+                    <img id="light4" class="light-button light-off" src="BCN3.png" alt="Light 4" onclick="toggleLight(4)">
+                    <button class="button" id="jump4">Waiting</button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="button" onclick="toggleAndPlay()">Light Sequence and Video</button>
+                <button class="button" onclick="stopVideo()">Stop Video</button>
+            </div>
+
+            <div class="motion-container">
+                <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
+                <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
             </div>
         </div>
     </div>
 
     <script>
         const piIp = "https://api.marcosismotion.co.uk";
-        let jumpTimes = [5, 10, 15, 20, 25]; 
 
         function checkLogin() {
             var username = document.getElementById("username").value;
@@ -157,8 +176,9 @@
                 document.getElementById("loginOverlay").style.display = "none";
                 document.getElementById("mainContent").classList.remove("blurred-background");
 
-                console.log("🚀 Logged in! Fetching jump times...");
+                console.log("🚀 Logged in! Fetching jump times & updating statuses...");
                 fetchJumpTimes();
+                updateAllStatuses();
             } else {
                 document.getElementById("errorMessage").style.display = "block";
             }
@@ -166,58 +186,37 @@
 
         function fetchJumpTimes() {
             fetch(`${piIp}/get_jump_times`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     console.log("✅ Jump times fetched:", data);
                     jumpTimes = data.jump_times;
                     updateJumpButtons();
                 })
-                .catch(error => {
-                    console.error("❌ Error fetching jump times:", error);
-                });
+                .catch(error => console.error("❌ Error fetching jump times:", error));
         }
 
         function updateJumpButtons() {
-            console.log("🔄 Updating Jump Buttons:", jumpTimes);
-            document.getElementById("jump1").onclick = function () { 
-                console.log(`Clicked Button 1 -> Jumping to ${jumpTimes[0]}`);
-                jumpToTime(jumpTimes[0]);
-            };
-            document.getElementById("jump2").onclick = function () { 
-                console.log(`Clicked Button 2 -> Jumping to ${jumpTimes[1]}`);
-                jumpToTime(jumpTimes[1]);
-            };
+            document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0]); };
+            document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1]); };
+            document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2]); };
+            document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3]); };
         }
 
-        function jumpToTime(timeInSeconds) {
-            console.log(`⏩ Jumping to time: ${timeInSeconds}`);
-            fetch(`${piIp}/jump_to_time?time=${timeInSeconds}`)
+        function jumpToTime(time) {
+            fetch(`${piIp}/jump_to_time?time=${time}`)
                 .then(response => response.text())
                 .then(data => console.log("📡 Jump Response:", data))
                 .catch(error => console.error("❌ Error:", error));
         }
 
-        function toggleLight(lightNumber) {
-            fetch(`${piIp}/toggle${lightNumber}`)
-                .then(() => updateStatus(lightNumber));
-        }
-
         function updateStatus(lightNumber) {
             fetch(`${piIp}/status${lightNumber}`)
                 .then(response => response.text())
-                .then(status => {
-                    document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
-                });
+                .then(status => document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`);
         }
 
         function updateAllStatuses() {
-            updateStatus(1);
-            updateStatus(2);
+            for (let i = 1; i <= 4; i++) updateStatus(i);
         }
 
         setInterval(updateAllStatuses, 5000);
