@@ -86,6 +86,8 @@
             border-radius: 8px;
             text-align: center;
             box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+            z-index: 11;
+            position: relative;
         }
         .login-box input {
             width: 80%;
@@ -105,14 +107,13 @@
             background-color: #6c7177;
         }
 
-        /* Blur effect before login */
-        .blurred {
+        /* Blur effect for background (but NOT login box) */
+        .blurred-background {
             filter: blur(5px);
-            pointer-events: none;
         }
     </style>
 </head>
-<body id="mainContent" class="blurred">
+<body>
 
     <!-- Login Overlay -->
     <div class="login-overlay" id="loginOverlay">
@@ -125,40 +126,42 @@
         </div>
     </div>
 
-    <h1>Lighting and Motion Control</h1>
+    <div id="mainContent" class="blurred-background">
+        <h1>Lighting and Motion Control</h1>
 
-    <div class="container">
-        <div class="light-row">
-            <div class="light-container">
-                <div class="light-status" id="statusText1">Light 1: OFF</div>
-                <img id="light1" class="light-button light-off" src="BCN2.png" alt="Light 1" onclick="toggleLight(1)">
-                <button class="button" id="jump1">1-2-3</button>
+        <div class="container">
+            <div class="light-row">
+                <div class="light-container">
+                    <div class="light-status" id="statusText1">Light 1: OFF</div>
+                    <img id="light1" class="light-button light-off" src="BCN2.png" alt="Light 1" onclick="toggleLight(1)">
+                    <button class="button" id="jump1">1-2-3</button>
+                </div>
+                <div class="light-container">
+                    <div class="light-status" id="statusText2">Light 2: OFF</div>
+                    <img id="light2" class="light-button light-off" src="BCN4.png" alt="Light 2" onclick="toggleLight(2)">
+                    <button class="button" id="jump2">Wheeeeee!</button>
+                </div>
+                <div class="light-container">
+                    <div class="light-status" id="statusText3">Light 3: OFF</div>
+                    <img id="light3" class="light-button light-off" src="BCN1.png" alt="Light 3" onclick="toggleLight(3)">
+                    <button class="button" id="jump3">Silence</button>
+                </div>
+                <div class="light-container">
+                    <div class="light-status" id="statusText4">Light 4: OFF</div>
+                    <img id="light4" class="light-button light-off" src="BCN3.png" alt="Light 4" onclick="toggleLight(4)">
+                    <button class="button" id="jump4">Waiting</button>
+                </div>
             </div>
-            <div class="light-container">
-                <div class="light-status" id="statusText2">Light 2: OFF</div>
-                <img id="light2" class="light-button light-off" src="BCN4.png" alt="Light 2" onclick="toggleLight(2)">
-                <button class="button" id="jump2">Wheeeeee!</button>
-            </div>
-            <div class="light-container">
-                <div class="light-status" id="statusText3">Light 3: OFF</div>
-                <img id="light3" class="light-button light-off" src="BCN1.png" alt="Light 3" onclick="toggleLight(3)">
-                <button class="button" id="jump3">Silence</button>
-            </div>
-            <div class="light-container">
-                <div class="light-status" id="statusText4">Light 4: OFF</div>
-                <img id="light4" class="light-button light-off" src="BCN3.png" alt="Light 4" onclick="toggleLight(4)">
-                <button class="button" id="jump4">Waiting</button>
-            </div>
-        </div>
 
-        <div class="controls">
-            <button class="button" onclick="toggleAndPlay()">Light Sequence and Video</button>
-            <button class="button" onclick="stopVideo()">Stop Video</button>
-        </div>
+            <div class="controls">
+                <button class="button" onclick="toggleAndPlay()">Light Sequence and Video</button>
+                <button class="button" onclick="stopVideo()">Stop Video</button>
+            </div>
 
-        <div class="motion-container">
-            <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
-            <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
+            <div class="motion-container">
+                <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
+                <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
+            </div>
         </div>
     </div>
 
@@ -169,7 +172,7 @@
 
             if (username === "admin" && password === "admin") {
                 document.getElementById("loginOverlay").style.display = "none";
-                document.getElementById("mainContent").classList.remove("blurred");
+                document.getElementById("mainContent").classList.remove("blurred-background");
             } else {
                 document.getElementById("errorMessage").style.display = "block";
             }
