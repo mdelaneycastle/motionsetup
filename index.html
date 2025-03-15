@@ -141,32 +141,13 @@
                     <img id="light2" class="light-button light-off" src="BCN4.png" alt="Light 2" onclick="toggleLight(2)">
                     <button class="button" id="jump2">Wheeeeee!</button>
                 </div>
-                <div class="light-container">
-                    <div class="light-status" id="statusText3">Light 3: OFF</div>
-                    <img id="light3" class="light-button light-off" src="BCN1.png" alt="Light 3" onclick="toggleLight(3)">
-                    <button class="button" id="jump3">Silence</button>
-                </div>
-                <div class="light-container">
-                    <div class="light-status" id="statusText4">Light 4: OFF</div>
-                    <img id="light4" class="light-button light-off" src="BCN3.png" alt="Light 4" onclick="toggleLight(4)">
-                    <button class="button" id="jump4">Waiting</button>
-                </div>
-            </div>
-
-            <div class="controls">
-                <button class="button" onclick="toggleAndPlay()">Light Sequence and Video</button>
-                <button class="button" onclick="stopVideo()">Stop Video</button>
-            </div>
-
-            <div class="motion-container">
-                <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
-                <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
             </div>
         </div>
     </div>
 
     <script>
         const piIp = "https://api.marcosismotion.co.uk";
+        let jumpTimes = [5, 10, 15, 20, 25];
 
         function checkLogin() {
             var username = document.getElementById("username").value;
@@ -196,14 +177,12 @@
         }
 
         function updateJumpButtons() {
-            document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0]); };
-            document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1]); };
-            document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2]); };
-            document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3]); };
+            document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0], 1); };
+            document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1], 2); };
         }
 
-        function jumpToTime(time) {
-            fetch(`${piIp}/jump_to_time?time=${time}`)
+        function jumpToTime(time, lightNumber) {
+            fetch(`${piIp}/jump_to_time?time=${time}&light=${lightNumber}`)
                 .then(response => response.text())
                 .then(data => console.log("📡 Jump Response:", data))
                 .catch(error => console.error("❌ Error:", error));
@@ -217,6 +196,11 @@
 
         function updateAllStatuses() {
             for (let i = 1; i <= 4; i++) updateStatus(i);
+        }
+
+        function stopVideo() {
+            fetch(`${piIp}/stop_video`)
+                .then(() => console.log("📡 Video stopped"));
         }
 
         setInterval(updateAllStatuses, 5000);
