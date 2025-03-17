@@ -43,11 +43,12 @@
         .light-off {
             opacity: 0.4;
             box-shadow: none;
-        }
+       }
+
         .light-on {
             opacity: 1;
-            box-shadow: 0px 0px 15px 5px rgba(255, 255, 255, 0.8);
-        }
+            box-shadow: 0px 0px 15px 5px rgba(255, 255, 255, 0.8); /* 🔥 Glow Effect */
+      }
         .button {
             width: 220px;
             padding: 12px;
@@ -227,13 +228,26 @@
     function stopVideo() {
         fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
     }
-
-        function toggleLight(lightNumber) {
+function toggleLight(lightNumber) {
     fetch(`${piIp}/toggle${lightNumber}`)
         .then(response => response.text())
         .then(data => {
             console.log(`📡 Toggled Light ${lightNumber}:`, data);
-            updateStatus(lightNumber); // Ensure status updates correctly
+            
+            // Get the light image and status text
+            const lightImage = document.getElementById(`light${lightNumber}`);
+            const statusText = document.getElementById(`statusText${lightNumber}`);
+
+            // Toggle glow effect (light-on/light-off)
+            if (lightImage.classList.contains("light-off")) {
+                lightImage.classList.remove("light-off");
+                lightImage.classList.add("light-on");
+                statusText.innerText = `Light ${lightNumber}: ON`;
+            } else {
+                lightImage.classList.remove("light-on");
+                lightImage.classList.add("light-off");
+                statusText.innerText = `Light ${lightNumber}: OFF`;
+            }
         })
         .catch(error => console.error("❌ Error toggling light:", error));
 }
