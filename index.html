@@ -227,6 +227,16 @@
     function stopVideo() {
         fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
     }
+
+        function toggleLight(lightNumber) {
+    fetch(`${piIp}/toggle${lightNumber}`)
+        .then(response => response.text())
+        .then(data => {
+            console.log(`📡 Toggled Light ${lightNumber}:`, data);
+            updateStatus(lightNumber); // Ensure status updates correctly
+        })
+        .catch(error => console.error("❌ Error toggling light:", error));
+}
 </script>
 
 </body>
