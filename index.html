@@ -259,6 +259,16 @@ function toggleLight(lightNumber) {
         })
         .catch(error => console.error("❌ Error toggling light:", error));
 }
+function toggleAndPlay() {
+    console.log("🎬 Toggle & Play button pressed");
+
+    fetch(`${piIp}/toggle_and_play`)
+        .then(response => response.text())
+        .then(data => console.log("📡 Toggle & Play Response:", data))
+        .catch(error => console.error("❌ Error in toggleAndPlay:", error));
+}
+
+        
 
 // ✅ Immediately Fetch Jump Times on Page Load
 fetchJumpTimes();
