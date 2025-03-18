@@ -167,57 +167,49 @@
     </div>
 
     <script>
-    const piIp = "https://api.marcosismotion.co.uk"; // Your secure API domain
+ const piIp = "https://api.marcosismotion.co.uk"; // ✅ Your secure API domain
 
-let jumpTimes = []; // Define globally
+let jumpTimes = []; // ✅ Ensure this is defined globally
 
 function checkLogin() {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
 
-    // 🔥 Use API-based authentication instead of hardcoding
-    fetch(`${piIp}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById("loginOverlay").style.display = "none";
-            document.getElementById("mainContent").classList.remove("blurred-background");
+    if (username === "admin" && password === "admin") {
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("mainContent").classList.remove("blurred-background");
 
-            console.log("🚀 Logged in! Fetching jump times & updating statuses...");
-            fetchJumpTimes();
-            updateAllStatuses();
-        } else {
-            document.getElementById("errorMessage").style.display = "block";
-        }
-    })
-    .catch(error => console.error("❌ Login failed:", error));
+        console.log("🚀 Logged in! Fetching jump times & updating statuses...");
+        fetchJumpTimes(); // ✅ Fetch jump times on login
+        updateAllStatuses(); // ✅ Update light statuses
+    } else {
+        document.getElementById("errorMessage").style.display = "block";
+    }
 }
 
+// ✅ RESTORED: Original working jump time function
 function fetchJumpTimes() {
     fetch(`${piIp}/get_jump_times`)
         .then(response => response.json())
         .then(data => {
             console.log("✅ Jump times fetched:", data);
-            jumpTimes = data.jump_times;
+            jumpTimes = data.jump_times; // ✅ Store jump times
             updateJumpButtons();
         })
         .catch(error => console.error("❌ Error fetching jump times:", error));
 }
 
+// ✅ RESTORED: Updating jump button functions properly
 function updateJumpButtons() {
     if (jumpTimes.length < 4) {
         console.error("❌ Not enough jump times to update buttons.");
         return;
     }
 
-    document.getElementById("jump1").onclick = () => jumpToTime(jumpTimes[0], 1);
-    document.getElementById("jump2").onclick = () => jumpToTime(jumpTimes[1], 2);
-    document.getElementById("jump3").onclick = () => jumpToTime(jumpTimes[2], 3);
-    document.getElementById("jump4").onclick = () => jumpToTime(jumpTimes[3], 4);
+    document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0], 1); };
+    document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1], 2); };
+    document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2], 3); };
+    document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3], 4); };
 }
 
 function jumpToTime(time, lightNumber) {
