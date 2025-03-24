@@ -277,12 +277,26 @@ function toggleLight(lightNumber) {
         .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
 }
 function toggleAndPlay() {
-    console.log("🎬 Toggle & Play button pressed");
+    console.log("🎬 Turning on all lights and playing video...");
 
-    fetch(`${piIp}/toggle_and_play`)
-        .then(response => response.text())
-        .then(data => console.log("📡 Toggle & Play Response:", data))
-        .catch(error => console.error("❌ Error in toggleAndPlay:", error));
+    // Step 1: Turn all lights ON
+    fetch(`${piIp}/turn_all_lights_on`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("❌ Error turning on lights:", data.error);
+            } else {
+                console.log("✅ All lights turned ON:", data);
+                updateLightUI(); // Update UI to reflect lights ON
+
+                // Step 2: Start video AFTER lights are on
+                fetch(`${piIp}/play_video`)
+                    .then(response => response.text())
+                    .then(videoData => console.log("📡 Video started:", videoData))
+                    .catch(error => console.error("❌ Error starting video:", error));
+            }
+        })
+        .catch(error => console.error("❌ Error sending request to turn lights on:", error));
 }
 function updateLightUI(selectedLight) {
     for (let i = 1; i <= 4; i++) {
