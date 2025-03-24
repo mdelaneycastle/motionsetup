@@ -227,7 +227,6 @@ function updateStatus(lightNumber) {
         });
 }
 
-// ✅ Ensure lights start ON when page loads
 function updateAllStatuses() {
     console.log("🔄 Updating all statuses...");
 
@@ -235,22 +234,17 @@ function updateAllStatuses() {
         fetch(`${piIp}/status${i}`)
             .then(response => response.text())
             .then(status => {
-                const lightImage = document.getElementById(`light${i}`);
-                const statusText = document.getElementById(`statusText${i}`);
-
-                if (status.trim() === "ON") {
-                    lightImage.classList.remove("light-off");
-                    lightImage.classList.add("light-on");
-                    statusText.innerText = `Light ${i}: ON`;
-                } else {
-                    lightImage.classList.remove("light-on");
-                    lightImage.classList.add("light-off");
-                    statusText.innerText = `Light ${i}: OFF`;
-                }
+                let isOn = status.trim() === "ON";
+                updateLightUI(isOn ? i : null);
             })
             .catch(error => console.error(`❌ Error updating Light ${i} status:`, error));
     }
 }
+
+// ✅ Run this when page loads
+document.addEventListener("DOMContentLoaded", function () {
+    updateAllStatuses();
+});
 
 // ✅ Run this when page loads
 document.addEventListener("DOMContentLoaded", function () {
@@ -262,17 +256,18 @@ function stopVideo() {
 }
 
 function toggleLight(lightNumber) {
-    console.log(`📡 Turning ON Light ${lightNumber} and turning OFF others`);
+    console.log(`📡 Sending toggle request for Light ${lightNumber}`);
 
-    // Turn OFF all other lights
-    for (let i = 1; i <= 4; i++) {
-        if (i !== lightNumber) {
-            fetch(`${piIp}/toggle${i}`); // Send toggle request to turn OFF others
-            document.getElementById(`light${i}`).classList.remove("light-on");
-            document.getElementById(`light${i}`).classList.add("light-off");
-            document.getElementById(`statusText${i}`).innerText = `Light ${i}: OFF`;
-        }
-    }
+    fetch(`${piIp}/toggle${lightNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(`✅ Light ${lightNumber} toggled:`, data);
+
+            // Update UI to reflect the new state
+            updateLightUI(lightNumber);
+        })
+        .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
+}
 
     // Turn ON the selected light
     fetch(`${piIp}/toggle${lightNumber}`)
@@ -298,7 +293,22 @@ function toggleAndPlay() {
         .then(data => console.log("📡 Toggle & Play Response:", data))
         .catch(error => console.error("❌ Error in toggleAndPlay:", error));
 }
+function updateLightUI(selectedLight) {
+    for (let i = 1; i <= 4; i++) {
+        let lightImage = document.getElementById(`light${i}`);
+        let statusText = document.getElementById(`statusText${i}`);
 
+        if (i === selectedLight) {
+            lightImage.classList.remove("light-off");
+            lightImage.classList.add("light-on");
+            statusText.innerText = `Light ${i}: ON`;
+        } else {
+            lightImage.classList.remove("light-on");
+            lightImage.classList.add("light-off");
+            statusText.innerText = `Light ${i}: OFF`;
+        }
+    }
+}
         
 
 // ✅ Immediately Fetch Jump Times on Page Load
