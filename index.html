@@ -264,15 +264,22 @@ function stopVideo() {
 function toggleLight(lightNumber) {
     console.log(`📡 Sending toggle request for Light ${lightNumber}`);
 
-    fetch(`${piIp}/toggle${lightNumber}`)
-        .then(response => response.json())  // Expect JSON, not plain text
+    // Define color mappings for each light
+    const lightColors = {
+        1: { r: 255, g: 140, b: 0 },   // Tiger Orange
+        2: { r: 178, g: 34, b: 34 },   // Phonebox Red
+        3: { r: 34, g: 139, b: 34 },   // Grass Green
+        4: { r: 135, g: 206, b: 235 }  // Sky Blue
+    };
+
+    // Get the color for the selected light
+    let color = lightColors[lightNumber];
+
+    fetch(`${piIp}/toggle_light_color?light=${lightNumber}&r=${color.r}&g=${color.g}&b=${color.b}`)
+        .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                console.error(`❌ Error toggling Light ${lightNumber}: ${data.error}`);
-            } else {
-                console.log(`✅ Light ${lightNumber} toggled:`, data);
-                updateLightUI(lightNumber);
-            }
+            console.log(`✅ Light ${lightNumber} set to color:`, color, data);
+            updateLightUI(lightNumber);
         })
         .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
 }
