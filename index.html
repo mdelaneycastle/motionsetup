@@ -120,8 +120,8 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <h2>Login</h2>
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
+            <input type="text" id="username" placeholder="Username:">
+            <input type="password" id="password" placeholder="Password:">
             <button onclick="checkLogin()">Login</button>
             <p id="errorMessage" style="color: red; display: none;">Invalid login. Try again.</p>
         </div>
@@ -167,10 +167,11 @@
     </div>
 
     <script>
- const piIp = "https://api.marcosismotion.co.uk"; // ✅ Your secure API domain
+ const piIp = "https://api.marcosismotion.co.uk"; // ✅ Your API domain
 
 let jumpTimes = []; // ✅ Ensure this is defined globally
 
+// ✅ Login Function (Fixes "checkLogin is not defined" error)
 function checkLogin() {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
@@ -187,7 +188,7 @@ function checkLogin() {
     }
 }
 
-// ✅ RESTORED: Original working jump time function
+// ✅ Fetch jump times from API
 function fetchJumpTimes() {
     fetch(`${piIp}/get_jump_times`)
         .then(response => response.json())
@@ -199,7 +200,7 @@ function fetchJumpTimes() {
         .catch(error => console.error("❌ Error fetching jump times:", error));
 }
 
-// ✅ RESTORED: Updating jump button functions properly
+// ✅ Update jump buttons
 function updateJumpButtons() {
     if (jumpTimes.length < 4) {
         console.error("❌ Not enough jump times to update buttons.");
@@ -212,6 +213,7 @@ function updateJumpButtons() {
     document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3], 4); };
 }
 
+// ✅ Jump to video timestamp
 function jumpToTime(time, lightNumber) {
     fetch(`${piIp}/jump_to_time?time=${time}&light=${lightNumber}`)
         .then(response => response.text())
@@ -219,14 +221,7 @@ function jumpToTime(time, lightNumber) {
         .catch(error => console.error("❌ Error:", error));
 }
 
-function updateStatus(lightNumber) {
-    fetch(`${piIp}/status${lightNumber}`)
-        .then(response => response.text())
-        .then(status => {
-            document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
-        });
-}
-
+// ✅ Fetch and update light statuses
 function updateAllStatuses() {
     console.log("🔄 Updating all statuses...");
 
@@ -241,58 +236,7 @@ function updateAllStatuses() {
     }
 }
 
-// ✅ Run this when page loads
-document.addEventListener("DOMContentLoaded", function () {
-    updateAllStatuses();
-});
-
-// ✅ Run this when page loads
-document.addEventListener("DOMContentLoaded", function () {
-    updateAllStatuses();
-});
-
-function stopVideo() {
-    fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
-}
-
-function toggleLight(lightNumber) {
-    console.log(`📡 Sending toggle request for Light ${lightNumber}`);
-
-    fetch(`${piIp}/toggle${lightNumber}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log(`✅ Light ${lightNumber} toggled:`, data);
-
-            // Update UI to reflect the new state
-            updateLightUI(lightNumber);
-        })
-        .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
-}
-
-    // Turn ON the selected light
-    fetch(`${piIp}/toggle${lightNumber}`)
-        .then(response => response.text())
-        .then(data => {
-            console.log(`✅ Light ${lightNumber} ON`, data);
-
-            // Update UI
-            const lightImage = document.getElementById(`light${lightNumber}`);
-            const statusText = document.getElementById(`statusText${lightNumber}`);
-
-            lightImage.classList.remove("light-off");
-            lightImage.classList.add("light-on");
-            statusText.innerText = `Light ${lightNumber}: ON`;
-        })
-        .catch(error => console.error("❌ Error toggling light:", error));
-}
-function toggleAndPlay() {
-    console.log("🎬 Toggle & Play button pressed");
-
-    fetch(`${piIp}/toggle_and_play`)
-        .then(response => response.text())
-        .then(data => console.log("📡 Toggle & Play Response:", data))
-        .catch(error => console.error("❌ Error in toggleAndPlay:", error));
-}
+// ✅ Update UI to show correct light status
 function updateLightUI(selectedLight) {
     for (let i = 1; i <= 4; i++) {
         let lightImage = document.getElementById(`light${i}`);
@@ -309,10 +253,42 @@ function updateLightUI(selectedLight) {
         }
     }
 }
-        
 
-// ✅ Immediately Fetch Jump Times on Page Load
-fetchJumpTimes();
+// ✅ Toggle light function
+function toggleLight(lightNumber) {
+    console.log(`📡 Sending toggle request for Light ${lightNumber}`);
+
+    fetch(`${piIp}/toggle${lightNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(`✅ Light ${lightNumber} toggled:`, data);
+
+            // Update UI to reflect the new state
+            updateLightUI(lightNumber);
+        })
+        .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
+}
+
+// ✅ Toggle and Play function
+function toggleAndPlay() {
+    console.log("🎬 Toggle & Play button pressed");
+
+    fetch(`${piIp}/toggle_and_play`)
+        .then(response => response.text())
+        .then(data => console.log("📡 Toggle & Play Response:", data))
+        .catch(error => console.error("❌ Error in toggleAndPlay:", error));
+}
+
+// ✅ Stop Video Function
+function stopVideo() {
+    fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
+}
+
+// ✅ Run this when page loads
+document.addEventListener("DOMContentLoaded", function () {
+    updateAllStatuses();
+    fetchJumpTimes();
+});
 </script>
 
 </body>
