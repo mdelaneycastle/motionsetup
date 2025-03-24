@@ -265,10 +265,14 @@ function toggleLight(lightNumber) {
     console.log(`📡 Sending toggle request for Light ${lightNumber}`);
 
     fetch(`${piIp}/toggle${lightNumber}`)
-        .then(response => response.json())
+        .then(response => response.json())  // Expect JSON, not plain text
         .then(data => {
-            console.log(`✅ Light ${lightNumber} toggled:`, data);
-            updateLightUI(lightNumber);
+            if (data.error) {
+                console.error(`❌ Error toggling Light ${lightNumber}: ${data.error}`);
+            } else {
+                console.log(`✅ Light ${lightNumber} toggled:`, data);
+                updateLightUI(lightNumber);
+            }
         })
         .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
 }
