@@ -261,27 +261,35 @@ function stopVideo() {
     fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
 }
 
-function toggleLight(lightNumber) {
-    console.log(`📡 Sending toggle request for Light ${lightNumber}`);
+function toggleLight(buttonNumber) {
+    console.log(`📡 Sending toggle request for Button ${buttonNumber}`);
 
-    // Define color mappings for each light
-    const lightColors = {
-        1: { r: 255, g: 140, b: 0 },   // Tiger Orange
-        2: { r: 178, g: 34, b: 34 },   // Phonebox Red
-        3: { r: 34, g: 139, b: 34 },   // Grass Green
-        4: { r: 135, g: 206, b: 235 }  // Sky Blue
+    // Map buttons to real lights (since you only have 2 lights)
+    const lightMapping = {
+        1: 1,  // Button 1 -> Light 1
+        2: 2,  // Button 2 -> Light 2
+        3: 1,  // Button 3 -> Light 1
+        4: 2   // Button 4 -> Light 2
     };
 
-    // Get the color for the selected light
-    let color = lightColors[lightNumber];
+    // Define colors for each button
+    const lightColors = {
+        1: { r: 255, g: 140, b: 0 },   // Tiger Orange (Light 1)
+        2: { r: 178, g: 34, b: 34 },   // Phonebox Red (Light 2)
+        3: { r: 34, g: 139, b: 34 },   // Grass Green (Light 1)
+        4: { r: 135, g: 206, b: 235 }  // Sky Blue (Light 2)
+    };
 
-    fetch(`${piIp}/toggle_light_color?light=${lightNumber}&r=${color.r}&g=${color.g}&b=${color.b}`)
+    let actualLight = lightMapping[buttonNumber]; // Map the button to the correct light
+    let color = lightColors[buttonNumber]; // Get the color
+
+    fetch(`${piIp}/toggle_light_color?light=${actualLight}&r=${color.r}&g=${color.g}&b=${color.b}`)
         .then(response => response.json())
         .then(data => {
-            console.log(`✅ Light ${lightNumber} set to color:`, color, data);
-            updateLightUI(lightNumber);
+            console.log(`✅ Light ${actualLight} (Button ${buttonNumber}) set to color:`, color, data);
+            updateLightUI(actualLight);
         })
-        .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
+        .catch(error => console.error(`❌ Error toggling Light ${actualLight}:`, error));
 }
 function toggleAndPlay() {
     console.log("🎬 Turning on all lights at 50% brightness and playing video...");
