@@ -277,19 +277,17 @@ function toggleLight(lightNumber) {
         .catch(error => console.error(`❌ Error toggling Light ${lightNumber}:`, error));
 }
 function toggleAndPlay() {
-    console.log("🎬 Turning on all lights and playing video...");
+    console.log("🎬 Turning on all lights at 50% brightness and playing video...");
 
-    // Step 1: Turn all lights ON
-    fetch(`${piIp}/turn_all_lights_on`)
+    fetch(`${piIp}/turn_all_lights_on?brightness=128`) // 128 = 50% brightness (range: 0-255)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 console.error("❌ Error turning on lights:", data.error);
             } else {
-                console.log("✅ All lights turned ON:", data);
-                updateLightUI(); // Update UI to reflect lights ON
+                console.log("✅ All lights turned ON at 50% brightness:", data);
+                updateLightUI(null, true); // Update UI to show all lights ON
 
-                // Step 2: Start video AFTER lights are on
                 fetch(`${piIp}/play_video`)
                     .then(response => response.text())
                     .then(videoData => console.log("📡 Video started:", videoData))
