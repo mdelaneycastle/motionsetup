@@ -134,22 +134,22 @@
             <div class="light-row">
                 <div class="light-container">
                     <div class="light-status" id="statusText1">Light 1: OFF</div>
-                    <img id="light1" class="light-button light-off" src="BCN2.png" alt="Light 1" onclick="toggleLight(1)">
+                    <img id="light1" class="light-button light-on" src="BCN2.png" alt="Light 1" onclick="toggleLight(1)">
                     <button class="button" id="jump1">1-2-3</button>
                 </div>
                 <div class="light-container">
                     <div class="light-status" id="statusText2">Light 2: OFF</div>
-                    <img id="light2" class="light-button light-off" src="BCN4.png" alt="Light 2" onclick="toggleLight(2)">
+                    <img id="light2" class="light-button light-on" src="BCN4.png" alt="Light 2" onclick="toggleLight(2)">
                     <button class="button" id="jump2">Wheeeeee!</button>
                 </div>
                 <div class="light-container">
                     <div class="light-status" id="statusText3">Light 3: OFF</div>
-                    <img id="light3" class="light-button light-off" src="BCN1.png" alt="Light 3" onclick="toggleLight(3)">
+                    <img id="light3" class="light-button light-on" src="BCN1.png" alt="Light 3" onclick="toggleLight(3)">
                     <button class="button" id="jump3">Silence</button>
                 </div>
                 <div class="light-container">
                     <div class="light-status" id="statusText4">Light 4: OFF</div>
-                    <img id="light4" class="light-button light-off" src="BCN3.png" alt="Light 4" onclick="toggleLight(4)">
+                    <img id="light4" class="light-button light-on" src="BCN3.png" alt="Light 4" onclick="toggleLight(4)">
                     <button class="button" id="jump4">Waiting</button>
                 </div>
             </div>
@@ -189,7 +189,7 @@ function checkLogin() {
 
 // ✅ RESTORED: Original working jump time function
 function fetchJumpTimes() {
-    fetch(${piIp}/get_jump_times)
+    fetch(`${piIp}/get_jump_times`)
         .then(response => response.json())
         .then(data => {
             console.log("✅ Jump times fetched:", data);
@@ -213,56 +213,87 @@ function updateJumpButtons() {
 }
 
 function jumpToTime(time, lightNumber) {
-    fetch(${piIp}/jump_to_time?time=${time}&light=${lightNumber})
+    fetch(`${piIp}/jump_to_time?time=${time}&light=${lightNumber}`)
         .then(response => response.text())
         .then(data => console.log("📡 Jump Response:", data))
         .catch(error => console.error("❌ Error:", error));
 }
 
 function updateStatus(lightNumber) {
-    fetch(${piIp}/status${lightNumber})
+    fetch(`${piIp}/status${lightNumber}`)
         .then(response => response.text())
         .then(status => {
-            document.getElementById(statusText${lightNumber}).innerText = Light ${lightNumber}: ${status};
+            document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
         });
 }
 
+// ✅ Ensure lights start ON when page loads
 function updateAllStatuses() {
     console.log("🔄 Updating all statuses...");
+
     for (let i = 1; i <= 4; i++) {
-        updateStatus(i);
+        fetch(`${piIp}/status${i}`)
+            .then(response => response.text())
+            .then(status => {
+                const lightImage = document.getElementById(`light${i}`);
+                const statusText = document.getElementById(`statusText${i}`);
+
+                if (status.trim() === "ON") {
+                    lightImage.classList.remove("light-off");
+                    lightImage.classList.add("light-on");
+                    statusText.innerText = `Light ${i}: ON`;
+                } else {
+                    lightImage.classList.remove("light-on");
+                    lightImage.classList.add("light-off");
+                    statusText.innerText = `Light ${i}: OFF`;
+                }
+            })
+            .catch(error => console.error(`❌ Error updating Light ${i} status:`, error));
     }
 }
 
+// ✅ Run this when page loads
+document.addEventListener("DOMContentLoaded", function () {
+    updateAllStatuses();
+});
+
 function stopVideo() {
-    fetch(${piIp}/stop_video).then(() => console.log("📡 Video stopped"));
+    fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
 }
 
 function toggleLight(lightNumber) {
-    fetch(${piIp}/toggle${lightNumber})
+    console.log(`📡 Turning ON Light ${lightNumber} and turning OFF others`);
+
+    // Turn OFF all other lights
+    for (let i = 1; i <= 4; i++) {
+        if (i !== lightNumber) {
+            fetch(`${piIp}/toggle${i}`); // Send toggle request to turn OFF others
+            document.getElementById(`light${i}`).classList.remove("light-on");
+            document.getElementById(`light${i}`).classList.add("light-off");
+            document.getElementById(`statusText${i}`).innerText = `Light ${i}: OFF`;
+        }
+    }
+
+    // Turn ON the selected light
+    fetch(`${piIp}/toggle${lightNumber}`)
         .then(response => response.text())
         .then(data => {
-            console.log(📡 Toggled Light ${lightNumber}:, data);
-            
-            const lightImage = document.getElementById(light${lightNumber});
-            const statusText = document.getElementById(statusText${lightNumber});
+            console.log(`✅ Light ${lightNumber} ON`, data);
 
-            if (lightImage.classList.contains("light-off")) {
-                lightImage.classList.remove("light-off");
-                lightImage.classList.add("light-on");
-                statusText.innerText = Light ${lightNumber}: ON;
-            } else {
-                lightImage.classList.remove("light-on");
-                lightImage.classList.add("light-off");
-                statusText.innerText = Light ${lightNumber}: OFF;
-            }
+            // Update UI
+            const lightImage = document.getElementById(`light${lightNumber}`);
+            const statusText = document.getElementById(`statusText${lightNumber}`);
+
+            lightImage.classList.remove("light-off");
+            lightImage.classList.add("light-on");
+            statusText.innerText = `Light ${lightNumber}: ON`;
         })
         .catch(error => console.error("❌ Error toggling light:", error));
 }
 function toggleAndPlay() {
     console.log("🎬 Toggle & Play button pressed");
 
-    fetch(${piIp}/toggle_and_play)
+    fetch(`${piIp}/toggle_and_play`)
         .then(response => response.text())
         .then(data => console.log("📡 Toggle & Play Response:", data))
         .catch(error => console.error("❌ Error in toggleAndPlay:", error));
