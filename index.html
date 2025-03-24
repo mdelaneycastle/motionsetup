@@ -258,7 +258,23 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function stopVideo() {
-    fetch(`${piIp}/stop_video`).then(() => console.log("📡 Video stopped"));
+    console.log("🛑 Stopping video and turning off all lights...");
+
+    fetch(`${piIp}/stop_video`)
+        .then(response => response.text())
+        .then(data => {
+            console.log("📡 Video stopped:", data);
+
+            // Turn off all lights
+            fetch(`${piIp}/turn_all_lights_off`)
+                .then(response => response.json())
+                .then(lightData => {
+                    console.log("💡 All lights turned OFF:", lightData);
+                    updateLightUI(null, true); // Update UI to reflect lights off
+                })
+                .catch(error => console.error("❌ Error turning lights off:", error));
+        })
+        .catch(error => console.error("❌ Error stopping video:", error));
 }
 
 function toggleLight(buttonNumber) {
@@ -311,19 +327,21 @@ function toggleAndPlay() {
         })
         .catch(error => console.error("❌ Error sending request to turn lights on:", error));
 }
-function updateLightUI(selectedButton = null) {
+function updateLightUI(selectedButton = null, allOff = false) {
     for (let button = 1; button <= 4; button++) {
         let lightImage = document.getElementById(`light${button}`);
         let statusText = document.getElementById(`statusText${button}`);
 
-        if (button === selectedButton) {
+        if (allOff) {
+            // Turn ALL lights OFF (for stopVideo function)
+            lightImage.classList.remove("light-on");
+            lightImage.classList.add("light-off");
+            statusText.innerText = `Light ${button}: OFF`;
+        } else if (button === selectedButton) {
             // Only update the clicked button
             lightImage.classList.add("light-on");
             lightImage.classList.remove("light-off");
             statusText.innerText = `Light ${button}: ON`;
-        } else {
-            // Do NOT reset other lights, only update the clicked button
-            statusText.innerText = `Light ${button}: OFF`;
         }
     }
 }
