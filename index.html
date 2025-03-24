@@ -298,23 +298,30 @@ function toggleAndPlay() {
         })
         .catch(error => console.error("❌ Error sending request to turn lights on:", error));
 }
-function updateLightUI(selectedLight) {
+function updateLightUI(selectedLight = null, allOn = false) {
     for (let i = 1; i <= 4; i++) {
         let lightImage = document.getElementById(`light${i}`);
         let statusText = document.getElementById(`statusText${i}`);
 
-        if (i === selectedLight) {
+        if (allOn) {
+            // If allOn is true, turn all lights ON
             lightImage.classList.remove("light-off");
             lightImage.classList.add("light-on");
             statusText.innerText = `Light ${i}: ON`;
-        } else {
-            lightImage.classList.remove("light-on");
-            lightImage.classList.add("light-off");
-            statusText.innerText = `Light ${i}: OFF`;
+        } else if (selectedLight !== null) {
+            // If a specific light is toggled, turn that one ON and the rest OFF
+            if (i === selectedLight) {
+                lightImage.classList.remove("light-off");
+                lightImage.classList.add("light-on");
+                statusText.innerText = `Light ${i}: ON`;
+            } else {
+                lightImage.classList.remove("light-on");
+                lightImage.classList.add("light-off");
+                statusText.innerText = `Light ${i}: OFF`;
+            }
         }
     }
 }
-        
 
 // ✅ Immediately Fetch Jump Times on Page Load
 fetchJumpTimes();
