@@ -311,36 +311,19 @@ function toggleAndPlay() {
         })
         .catch(error => console.error("❌ Error sending request to turn lights on:", error));
 }
-function updateLightUI(selectedButton = null, allOn = false) {
-    // Map buttons to real lights
-    const buttonToLight = {
-        1: 1,  // Button 1 -> Light 1
-        2: 2,  // Button 2 -> Light 2
-        3: 1,  // Button 3 -> Light 1
-        4: 2   // Button 4 -> Light 2
-    };
-
+function updateLightUI(selectedButton = null) {
     for (let button = 1; button <= 4; button++) {
-        let lightNumber = buttonToLight[button]; // Get the real light this button controls
         let lightImage = document.getElementById(`light${button}`);
         let statusText = document.getElementById(`statusText${button}`);
 
-        if (allOn) {
-            // Turn all lights ON
-            lightImage.classList.remove("light-off");
+        if (button === selectedButton) {
+            // Only update the clicked button
             lightImage.classList.add("light-on");
+            lightImage.classList.remove("light-off");
             statusText.innerText = `Light ${button}: ON`;
-        } else if (selectedButton !== null) {
-            // Check if the selected button maps to the same physical light
-            if (buttonToLight[selectedButton] === lightNumber) {
-                lightImage.classList.remove("light-off");
-                lightImage.classList.add("light-on");
-                statusText.innerText = `Light ${button}: ON`;
-            } else {
-                lightImage.classList.remove("light-on");
-                lightImage.classList.add("light-off");
-                statusText.innerText = `Light ${button}: OFF`;
-            }
+        } else {
+            // Do NOT reset other lights, only update the clicked button
+            statusText.innerText = `Light ${button}: OFF`;
         }
     }
 }
