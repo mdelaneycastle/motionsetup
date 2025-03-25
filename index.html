@@ -325,24 +325,16 @@ function toggleLight(buttonNumber) {
         .catch(error => console.error(`❌ Error toggling Light ${actualLight}:`, error));
 }
 function toggleAndPlay() {
-    console.log("🎬 Turning on all lights at 50% brightness and playing video...");
+    console.log("🎬 Starting timed light sequence and playing video...");
 
-    fetch(`${piIp}/turn_all_lights_on?brightness=128`) // 128 = 50% brightness (range: 0-255)
-        .then(response => response.json())
+    fetch(`${piIp}/toggle_and_play`)
+        .then(response => response.text())
         .then(data => {
-            if (data.error) {
-                console.error("❌ Error turning on lights:", data.error);
-            } else {
-                console.log("✅ All lights turned ON at 50% brightness:", data);
-                updateLightUI(null, true); // Update UI to show all lights ON
-
-                fetch(`${piIp}/play_video`)
-                    .then(response => response.text())
-                    .then(videoData => console.log("📡 Video started:", videoData))
-                    .catch(error => console.error("❌ Error starting video:", error));
-            }
+            console.log("✅ Triggered:", data);
         })
-        .catch(error => console.error("❌ Error sending request to turn lights on:", error));
+        .catch(error => {
+            console.error("❌ Error triggering sequence:", error);
+        });
 }
 function updateLightUI(selectedButton = null, allOff = false, whiteMode = false) {
     for (let button = 1; button <= 4; button++) {
