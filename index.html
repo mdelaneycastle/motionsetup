@@ -156,6 +156,7 @@
 
             <div class="controls">
                 <button class="button" onclick="toggleAndPlay()">Light Sequence and Video</button>
+                <button class="button" onclick="activateWhiteMode()">All Lights 50% White</button>
                 <button class="button" onclick="stopVideo()">Stop Video</button>
             </div>
 
@@ -185,6 +186,22 @@ function checkLogin() {
     } else {
         document.getElementById("errorMessage").style.display = "block";
     }
+}
+
+        function activateWhiteMode() {
+    console.log("🌟 Setting all lights to white at 50% brightness...");
+
+    fetch(`${piIp}/turn_all_lights_on?brightness=128`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("❌ Failed to set lights to white mode:", data.error);
+            } else {
+                console.log("✅ All lights set to white at 50%:", data);
+                updateLightUI(null, false, true); // new flag for white ambient mode
+            }
+        })
+        .catch(error => console.error("❌ Error triggering white mode:", error));
 }
 
 // ✅ RESTORED: Original working jump time function
@@ -327,20 +344,22 @@ function toggleAndPlay() {
         })
         .catch(error => console.error("❌ Error sending request to turn lights on:", error));
 }
-function updateLightUI(selectedButton = null, allOff = false) {
+function updateLightUI(selectedButton = null, allOff = false, whiteMode = false) {
     for (let button = 1; button <= 4; button++) {
         let lightImage = document.getElementById(`light${button}`);
         let statusText = document.getElementById(`statusText${button}`);
 
         if (allOff) {
-            // Turn ALL lights OFF (for stopVideo function)
             lightImage.classList.remove("light-on");
             lightImage.classList.add("light-off");
             statusText.innerText = `Light ${button}: OFF`;
-        } else if (button === selectedButton) {
-            // Only update the clicked button
-            lightImage.classList.add("light-on");
+        } else if (whiteMode) {
             lightImage.classList.remove("light-off");
+            lightImage.classList.add("light-on");
+            statusText.innerText = `Light ${button}: ON`;
+        } else if (button === selectedButton) {
+            lightImage.classList.remove("light-off");
+            lightImage.classList.add("light-on");
             statusText.innerText = `Light ${button}: ON`;
         }
     }
