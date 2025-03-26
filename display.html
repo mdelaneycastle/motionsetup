@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Artwork Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    #container {
+      max-width: 600px;
+      padding: 20px;
+    }
+    #info {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      background-color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h1 id="status">Waiting for interaction...</h1>
+    <div id="info" style="display: none;"></div>
+  </div>
+
+  <script>
+    const eventSource = new EventSource("https://YOUR_PI_DOMAIN_HERE:PORT/events");
+
+    eventSource.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      document.getElementById("status").style.display = "none";
+      const infoBox = document.getElementById("info");
+      infoBox.style.display = "block";
+      infoBox.innerHTML = `<h2>${data.title}</h2><p>${data.description}</p>`;
+    };
+  </script>
+</body>
+</html>
