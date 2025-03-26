@@ -191,7 +191,7 @@ function checkLogin() {
         function activateWhiteMode() {
     console.log("🌟 Setting all lights to white at 50% brightness...");
 
-    fetch(`${piIp}/turn_all_lights_on?brightness=128`)
+    fetch(`${piIp}/turn_all_lights_white`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
