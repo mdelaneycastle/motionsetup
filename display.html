@@ -35,16 +35,20 @@
     <div id="info" style="display: none;"></div>
   </div>
 
-  <script>
-    const eventSource = new EventSource("https://api.marcosismotion.co.uk/events");
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  const socket = io("https://api.marcosismotion.co.uk:5050");
 
-    eventSource.onmessage = function(event) {
-      const data = JSON.parse(event.data);
-      document.getElementById("status").style.display = "none";
-      const infoBox = document.getElementById("info");
-      infoBox.style.display = "block";
-      infoBox.innerHTML = `<h2>${data.title}</h2><p>${data.description}</p>`;
-    };
-  </script>
+  socket.on("connect", () => {
+    console.log("✅ Connected to WebSocket");
+  });
+
+  socket.on("update_display", (data) => {
+    document.getElementById("status").style.display = "none";
+    const infoBox = document.getElementById("info");
+    infoBox.style.display = "block";
+    infoBox.innerHTML = `<h2>Light ${data.light}</h2><p>Now showing: <a href="${data.url}" target="_blank">${data.url}</a></p>`;
+  });
+</script>
 </body>
 </html>
