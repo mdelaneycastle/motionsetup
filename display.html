@@ -47,7 +47,15 @@
     document.getElementById("status").style.display = "none";
     const infoBox = document.getElementById("info");
     infoBox.style.display = "block";
-    infoBox.innerHTML = `<h2>Light ${data.light}</h2><p>Now showing: <a href="${data.url}" target="_blank">${data.url}</a></p>`;
+
+    // Build HTML content
+    infoBox.innerHTML = `
+      <h2>Light ${data.light}</h2>
+      <h3>${data.title}</h3>
+      <p><strong>Artist:</strong> ${data.artist}</p>
+      <img src="${data.image_url}" alt="Artwork Thumbnail" style="max-width: 100%; border-radius: 8px; margin: 10px 0;">
+      <p><a href="${data.url}" target="_blank">View Full Artwork Page</a></p>
+    `;
   });
 </script>
 </body>
