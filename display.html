@@ -36,7 +36,7 @@
   </div>
 
   <script>
-    const eventSource = new EventSource("https://YOUR_PI_DOMAIN_HERE:PORT/events");
+    const source = new EventSource("https://api.marcosismotion.co.uk:5050/events");
 
     eventSource.onmessage = function(event) {
       const data = JSON.parse(event.data);
