@@ -34,14 +34,14 @@
 
   <script>
     function fade(target) {
-      fetch(`http://172.17.67.22:5050/activate?target=${target}`)
+      fetch(`https://josephapi.marcosismotion.co.uk/activate?target=${target}`)
         .then(res => res.json())
         .then(data => console.log("✅", data))
         .catch(err => console.error("❌", err));
     }
 
     function checkLights() {
-  fetch("http://172.17.67.22:5050/ping")
+  fetch("https://josephapi.marcosismotion.co.uk/ping")
     .then(res => res.json())
     .then(data => {
       const statusDiv = document.getElementById("status");
