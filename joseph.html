@@ -28,6 +28,7 @@
 </head>
 <body>
   <h1>Light Fade Test</h1>
+  <div id="status">Checking lights...</div>
   <button onclick="fade(1)">Light 1 Red</button>
   <button onclick="fade(2)">Light 2 Cyan</button>
 
@@ -38,6 +39,29 @@
         .then(data => console.log("✅", data))
         .catch(err => console.error("❌", err));
     }
+
+    function checkLights() {
+  fetch("http://172.17.67.22:5050/ping")
+    .then(res => res.json())
+    .then(data => {
+      const statusDiv = document.getElementById("status");
+      if (data.status === "ok") {
+        statusDiv.textContent = "✅ Lights Connected";
+        statusDiv.style.color = "lightgreen";
+      } else {
+        statusDiv.textContent = "❌ Lights Not Reachable";
+        statusDiv.style.color = "orange";
+      }
+    })
+    .catch(err => {
+      const statusDiv = document.getElementById("status");
+      statusDiv.textContent = "❌ Connection Error";
+      statusDiv.style.color = "red";
+    });
+}
+
+// Run it on page load
+checkLights();
   </script>
 </body>
 </html>
