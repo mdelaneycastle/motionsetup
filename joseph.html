@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joseph's Light Transition</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    button {
+      padding: 12px 24px;
+      margin: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #333;
+      color: white;
+    }
+    button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Joseph's Light Fader</h1>
+  <p>Fade from <strong>Red</strong> to <strong>Cyan</strong> or vice versa.</p>
+  <button onclick="fadeToRed()">Red Left / Cyan Right</button>
+  <button onclick="fadeToCyan()">Cyan Left / Red Right</button>
+
+  <script>
+    const piIp = "https://api.marcosismotion.co.uk";
+
+    function fadeToRed() {
+      fetch(`${piIp}/fade_to?left=r&right=c`);
+    }
+
+    function fadeToCyan() {
+      fetch(`${piIp}/fade_to?left=c&right=r`);
+    }
+  </script>
+</body>
+</html>
