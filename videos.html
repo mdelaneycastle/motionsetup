@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Uploader</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+    h1, h2 { color: #333; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 5px 0; background: #fff; padding: 10px; border-radius: 4px; }
+    input[type="file"] { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Upload a Video</h1>
+  <form id="uploadForm">
+    <input type="file" id="videoFile" name="file" accept="video/*" required>
+    <button type="submit">Upload</button>
+  </form>
+
+  <h2>Available Videos</h2>
+  <ul id="videoList"><li>Loading...</li></ul>
+
+  <script>
+    const apiBaseUrl = 'https://videos.marcosismotion.co.uk/api';
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('videoFile');
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          alert('✅ Upload successful!');
+          fileInput.value = '';
+          loadVideoList();
+        } else {
+          alert('❌ Upload failed.');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('❌ Upload failed. Check console for details.');
+      }
+    });
+
+    async function loadVideoList() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/videos`);
+        const videos = await response.json();
+        const videoList = document.getElementById('videoList');
+        videoList.innerHTML = '';
+        videos.forEach(video => {
+          const li = document.createElement('li');
+          li.textContent = video;
+          videoList.appendChild(li);
+        });
+      } catch (error) {
+        document.getElementById('videoList').innerHTML = '<li>Failed to load video list.</li>';
+        console.error('List error:', error);
+      }
+    }
+
+    loadVideoList();
+  </script>
+</body>
+</html>
