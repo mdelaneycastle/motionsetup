@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Video Uploader</title>
+  <title>Video Uploader & Configurator</title>
   <style>
     body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
     h1, h2 { color: #333; }
@@ -10,6 +10,7 @@
     .video-section { display: flex; flex-wrap: wrap; gap: 20px; }
     .video-block { display: flex; flex-direction: column; align-items: center; width: 180px; }
     .video-block img { max-width: 100%; height: auto; border: 1px solid #ccc; margin-bottom: 5px; }
+    button { padding: 8px 12px; margin-top: 10px; font-size: 16px; }
   </style>
 </head>
 <body>
@@ -25,13 +26,14 @@
   </div>
 
   <h2>Video Selections</h2>
-  <div class="video-section" id="videoSelectorSection">
-    <!-- dynamically filled -->
-  </div>
+  <div class="video-section" id="videoSelectorSection"></div>
+
+  <button onclick="saveSelection()">Save Selection</button>
 
   <script>
     const apiBaseUrl = 'https://videos.marcosismotion.co.uk/api';
     let allVideos = [];
+    const UPLOAD_FOLDER = '/home/admin/videos/';
 
     function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
@@ -132,6 +134,57 @@
             const selected = v === current ? 'selected' : '';
             return `<option value="${v}" ${disabled} ${selected}>${v}</option>`;
           }).join('');
+      }
+    }
+
+    async function getDuration(filename) {
+      const video = document.createElement("video");
+      video.src = `${apiBaseUrl}/videos/${encodeURIComponent(filename)}`;
+      return new Promise(resolve => {
+        video.onloadedmetadata = () => resolve(Math.floor(video.duration));
+        video.onerror = () => resolve(0);
+      });
+    }
+
+    async function saveSelection() {
+      const selections = [];
+      for (let i = 0; i < 5; i++) {
+        const select = document.getElementById(`dropdown${i}`);
+        if (!select || !select.value) {
+          alert("⚠️ Please make all 5 selections.");
+          return;
+        }
+        selections.push(select.value);
+      }
+
+      const durations = await Promise.all(selections.map(getDuration));
+      if (durations.some(d => d <= 0)) {
+        alert("⚠️ One or more video durations could not be determined.");
+        return;
+      }
+
+      const messages = [];
+      selections.forEach((path, i) => {
+        messages.push(`Updating video path for Segment ${i} to: ${UPLOAD_FOLDER + path}`);
+      });
+      durations.forEach((dur, i) => {
+        messages.push(`Updating Sleep ${i + 1} to: ${dur} seconds`);
+      });
+
+      try {
+        const res = await fetch(`${apiBaseUrl}/save-config`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lines: messages })
+        });
+        if (res.ok) {
+          alert("✅ Configuration saved successfully!");
+        } else {
+          alert("❌ Failed to save configuration.");
+        }
+      } catch (err) {
+        console.error("❌ Save error:", err);
+        alert("❌ Could not save. Check console for details.");
       }
     }
 
