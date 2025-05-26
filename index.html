@@ -112,7 +112,7 @@
 <body>
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
-            <h2>Login</h2>
+            <h2>Login.</h2>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <button onclick="checkLogin()">Login</button>
@@ -179,7 +179,7 @@ function fetchThumbnailsAndLabels() {
                         const img = document.createElement("img");
                         img.id = `light${i}`;
                         img.className = "light-button light-off";
-                        img.src = `${piIp}/api/thumbnail/${video.split("/").pop()}?t=${Date.now()}`;
+                        img.src = `https://videos.marcosismotion.co.uk/api/thumbnail/${video.split("/").pop()}?t=${Date.now()}`;
                         img.alt = `Light ${i}`;
                         img.onerror = () => img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAIAAAD+48g2AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QETEBkN1uCUygAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAABFUlEQVR42u3RAQ0AAAjDMO5fNNSMewAAgPgqSgMgnUSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJOmbwAG+DCfDkEqVAAAAAElFTkSuQmCC";
                         img.onclick = () => toggleLight(i);
