@@ -7,6 +7,9 @@
     body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
     h1, h2 { color: #333; }
     select, input[type="file"] { margin-bottom: 10px; padding: 6px; font-size: 16px; }
+    .video-section { display: flex; flex-wrap: wrap; gap: 20px; }
+    .video-block { display: flex; flex-direction: column; align-items: center; width: 180px; }
+    .video-block img { max-width: 100%; height: auto; border: 1px solid #ccc; margin-bottom: 5px; }
   </style>
 </head>
 <body>
@@ -21,14 +24,14 @@
     <p id="speedText">Speed: 0 MB/s</p>
   </div>
 
-  <h2>Available Videos</h2>
-  <img id="videoPreview" src="" alt="Preview will appear here" style="max-width: 300px; display: block; margin-bottom: 10px;">
-  <select id="videoDropdown">
-    <option disabled selected>Loading...</option>
-  </select>
+  <h2>Video Selections</h2>
+  <div class="video-section" id="videoSelectorSection">
+    <!-- dynamically filled -->
+  </div>
 
   <script>
     const apiBaseUrl = 'https://videos.marcosismotion.co.uk/api';
+    let allVideos = [];
 
     function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
@@ -75,31 +78,62 @@
     }
 
     async function loadVideoList() {
-  try {
-    const response = await fetch(`${apiBaseUrl}/videos`);
-    const videos = await response.json();
-    const dropdown = document.getElementById('videoDropdown');
-    dropdown.innerHTML = '<option disabled selected>Select a video</option>';
-    videos.forEach(video => {
-      const option = document.createElement('option');
-      option.value = video;
-      option.textContent = video;
-      dropdown.appendChild(option);
-    });
+      try {
+        const response = await fetch(`${apiBaseUrl}/videos`);
+        const videos = await response.json();
+        allVideos = videos;
+        const section = document.getElementById('videoSelectorSection');
+        section.innerHTML = '';
 
-    // When user selects a video, load thumbnail
-    dropdown.onchange = () => {
-      const selected = dropdown.value;
-      const preview = document.getElementById('videoPreview');
-      preview.src = `${apiBaseUrl}/thumbnail/${encodeURIComponent(selected)}?t=${Date.now()}`; // bust cache
-    };
+        for (let i = 0; i < 5; i++) {
+          const block = document.createElement('div');
+          block.className = 'video-block';
 
-  } catch (error) {
-    const dropdown = document.getElementById('videoDropdown');
-    dropdown.innerHTML = '<option>Failed to load video list.</option>';
-    console.error('List error:', error);
-  }
-}
+          const img = document.createElement('img');
+          img.id = `preview${i}`;
+          img.src = '';
+          img.alt = 'No preview';
+
+          const select = document.createElement('select');
+          select.id = `dropdown${i}`;
+          select.innerHTML = '<option disabled selected>Select a video</option>' +
+            videos.map(v => `<option value="${v}">${v}</option>`).join('');
+
+          select.addEventListener('change', () => {
+            const selected = select.value;
+            img.src = `${apiBaseUrl}/thumbnail/${encodeURIComponent(selected)}?t=${Date.now()}`;
+            updateDropdownOptions();
+          });
+
+          block.appendChild(img);
+          block.appendChild(select);
+          section.appendChild(block);
+        }
+
+        updateDropdownOptions();
+      } catch (error) {
+        console.error('List error:', error);
+      }
+    }
+
+    function updateDropdownOptions() {
+      const selectedValues = [];
+      for (let i = 0; i < 5; i++) {
+        const sel = document.getElementById(`dropdown${i}`);
+        if (sel && sel.value) selectedValues.push(sel.value);
+      }
+
+      for (let i = 0; i < 5; i++) {
+        const sel = document.getElementById(`dropdown${i}`);
+        const current = sel.value;
+        sel.innerHTML = '<option disabled>Select a video</option>' +
+          allVideos.map(v => {
+            const disabled = selectedValues.includes(v) && v !== current ? 'disabled' : '';
+            const selected = v === current ? 'selected' : '';
+            return `<option value="${v}" ${disabled} ${selected}>${v}</option>`;
+          }).join('');
+      }
+    }
 
     loadVideoList();
   </script>
