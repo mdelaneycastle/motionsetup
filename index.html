@@ -119,7 +119,7 @@
     <!-- Login Overlay -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
-            <h2>Login</h2>
+            <h2>Login.</h2>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <button onclick="checkLogin()">Login</button>
@@ -283,7 +283,7 @@ function stopVideo() {
             console.log("📡 Video stopped:", data);
 
             // Turn off all lights
-            fetch(`${piIp}/turn_all_lights_off`)
+            fetch(`${piIp}/turn_all_lights_white`)
                 .then(response => response.json())
                 .then(lightData => {
                     console.log("💡 All lights turned OFF:", lightData);
