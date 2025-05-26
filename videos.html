@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>Upload a Video.</h1>
+  <h1>Upload a Video</h1>
 
   <input type="file" id="fileInput" accept="video/*">
   <button onclick="uploadFile()">Upload</button>
@@ -93,8 +93,8 @@
 
           const img = document.createElement('img');
           img.id = `preview${i}`;
-          img.src = '';
-          img.alt = 'No preview';
+          img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='; // transparent 1x1 gif
+          img.alt = 'Select a video';
 
           const select = document.createElement('select');
           select.id = `dropdown${i}`;
