@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>Upload a Video</h1>
+  <h1>Upload a Video.</h1>
 
   <input type="file" id="fileInput" accept="video/*">
   <button onclick="uploadFile()">Upload</button>
@@ -147,46 +147,34 @@
     }
 
     async function saveSelection() {
-      const selections = [];
-      for (let i = 0; i < 5; i++) {
-        const select = document.getElementById(`dropdown${i}`);
-        if (!select || !select.value) {
-          alert("⚠️ Please make all 5 selections.");
-          return;
-        }
-        selections.push(select.value);
-      }
-
-      const durations = await Promise.all(selections.map(getDuration));
-      if (durations.some(d => d <= 0)) {
-        alert("⚠️ One or more video durations could not be determined.");
-        return;
-      }
-
-      const messages = [];
-      selections.forEach((path, i) => {
-        messages.push(`Updating video path for Segment ${i} to: ${UPLOAD_FOLDER + path}`);
-      });
-      durations.forEach((dur, i) => {
-        messages.push(`Updating Sleep ${i + 1} to: ${dur} seconds`);
-      });
-
-      try {
-        const res = await fetch(`${apiBaseUrl}/save-config`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lines: messages })
-        });
-        if (res.ok) {
-          alert("✅ Configuration saved successfully!");
-        } else {
-          alert("❌ Failed to save configuration.");
-        }
-      } catch (err) {
-        console.error("❌ Save error:", err);
-        alert("❌ Could not save. Check console for details.");
-      }
+  const selections = [];
+  for (let i = 0; i < 5; i++) {
+    const select = document.getElementById(`dropdown${i}`);
+    if (!select || !select.value) {
+      alert("⚠️ Please make all 5 selections.");
+      return;
     }
+    selections.push(select.value);
+  }
+
+  try {
+    const res = await fetch(`${apiBaseUrl}/save_config`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ videos: selections })
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("✅ " + result.message);
+    } else {
+      alert("❌ " + (result.error || "Failed to save configuration."));
+    }
+  } catch (err) {
+    console.error("❌ Save error:", err);
+    alert("❌ Could not save. Check console for details.");
+  }
+}
 
     loadVideoList();
   </script>
