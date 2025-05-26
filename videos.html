@@ -18,10 +18,63 @@
     <button type="submit">Upload</button>
   </form>
 
+  <input type="file" id="fileInput">
+<button onclick="uploadFile()">Upload</button>
+
+<div id="progressContainer" style="display:none; margin-top: 10px;">
+  <progress id="uploadProgress" value="0" max="100" style="width: 100%;"></progress>
+  <p id="progressText">0%</p>
+  <p id="speedText">Speed: 0 MB/s</p>
+</div>
+
   <h2>Available Videos</h2>
   <ul id="videoList"><li>Loading...</li></ul>
 
   <script>
+
+    function uploadFile() {
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return alert("Please choose a file.");
+
+  const xhr = new XMLHttpRequest();
+  const progressBar = document.getElementById("uploadProgress");
+  const progressText = document.getElementById("progressText");
+  const speedText = document.getElementById("speedText");
+  const container = document.getElementById("progressContainer");
+
+  const url = "https://videos.marcosismotion.co.uk/api/upload";
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  container.style.display = "block";
+  let startTime = new Date().getTime();
+
+  xhr.upload.addEventListener("progress", function (e) {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      progressBar.value = percent;
+      progressText.innerText = `${percent}%`;
+
+      const elapsedTime = (new Date().getTime() - startTime) / 1000; // seconds
+      const speedMBps = (e.loaded / (1024 * 1024)) / elapsedTime;
+      speedText.innerText = `Speed: ${speedMBps.toFixed(2)} MB/s`;
+    }
+  });
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      alert("✅ Upload complete!");
+      progressBar.value = 0;
+      progressText.innerText = "0%";
+      speedText.innerText = "Speed: 0 MB/s";
+      container.style.display = "none";
+    }
+  };
+
+  xhr.open("POST", url, true);
+  xhr.send(formData);
+}
     const apiBaseUrl = 'https://videos.marcosismotion.co.uk/api';
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
