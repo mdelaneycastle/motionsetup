@@ -22,6 +22,7 @@
   </div>
 
   <h2>Available Videos</h2>
+  <img id="videoPreview" src="" alt="Preview will appear here" style="max-width: 300px; display: block; margin-bottom: 10px;">
   <select id="videoDropdown">
     <option disabled selected>Loading...</option>
   </select>
@@ -74,23 +75,31 @@
     }
 
     async function loadVideoList() {
-      try {
-        const response = await fetch(`${apiBaseUrl}/videos`);
-        const videos = await response.json();
-        const dropdown = document.getElementById('videoDropdown');
-        dropdown.innerHTML = ''; // Clear existing options
-        videos.forEach(video => {
-          const option = document.createElement('option');
-          option.value = video;
-          option.textContent = video;
-          dropdown.appendChild(option);
-        });
-      } catch (error) {
-        const dropdown = document.getElementById('videoDropdown');
-        dropdown.innerHTML = '<option>Failed to load video list.</option>';
-        console.error('List error:', error);
-      }
-    }
+  try {
+    const response = await fetch(`${apiBaseUrl}/videos`);
+    const videos = await response.json();
+    const dropdown = document.getElementById('videoDropdown');
+    dropdown.innerHTML = '<option disabled selected>Select a video</option>';
+    videos.forEach(video => {
+      const option = document.createElement('option');
+      option.value = video;
+      option.textContent = video;
+      dropdown.appendChild(option);
+    });
+
+    // When user selects a video, load thumbnail
+    dropdown.onchange = () => {
+      const selected = dropdown.value;
+      const preview = document.getElementById('videoPreview');
+      preview.src = `${apiBaseUrl}/thumbnail/${encodeURIComponent(selected)}?t=${Date.now()}`; // bust cache
+    };
+
+  } catch (error) {
+    const dropdown = document.getElementById('videoDropdown');
+    dropdown.innerHTML = '<option>Failed to load video list.</option>';
+    console.error('List error:', error);
+  }
+}
 
     loadVideoList();
   </script>
