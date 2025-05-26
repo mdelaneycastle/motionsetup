@@ -43,12 +43,11 @@
         .light-off {
             opacity: 0.4;
             box-shadow: none;
-       }
-
+        }
         .light-on {
             opacity: 1;
-            box-shadow: 0px 0px 15px 5px rgba(255, 255, 255, 0.8); /* 🔥 Glow Effect */
-      }
+            box-shadow: 0px 0px 15px 5px rgba(255, 255, 255, 0.8);
+        }
         .button {
             width: 220px;
             padding: 12px;
@@ -66,8 +65,6 @@
         .motion-container {
             margin-top: 20px;
         }
-
-        /* Login Modal */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -107,16 +104,12 @@
         .login-box button:hover {
             background-color: #6c7177;
         }
-
-        /* Blur effect for background (but NOT login box) */
         .blurred-background {
             filter: blur(5px);
         }
     </style>
 </head>
 <body>
-
-    <!-- Login Overlay -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <h2>Login.</h2>
@@ -129,37 +122,13 @@
 
     <div id="mainContent" class="blurred-background">
         <h1>Lighting and Motion Control</h1>
-
         <div class="container">
-            <div class="light-row">
-                <div class="light-container">
-                    <div class="light-status" id="statusText1">Light 1: OFF</div>
-                    <img id="light1" class="light-button light-on" src="BCN1.png" alt="Light 1" onclick="toggleLight(1)">
-                    <button class="button" id="jump1">Silence</button>
-                </div>
-                <div class="light-container">
-                    <div class="light-status" id="statusText2">Light 2: OFF</div>
-                    <img id="light2" class="light-button light-on" src="BCN2.png" alt="Light 2" onclick="toggleLight(2)">
-                    <button class="button" id="jump2">1-2-3</button>
-                </div>
-                <div class="light-container">
-                    <div class="light-status" id="statusText3">Light 3: OFF</div>
-                    <img id="light3" class="light-button light-on" src="BCN3.png" alt="Light 3" onclick="toggleLight(3)">
-                    <button class="button" id="jump3">Waiting</button>
-                </div>
-                <div class="light-container">
-                    <div class="light-status" id="statusText4">Light 4: OFF</div>
-                    <img id="light4" class="light-button light-on" src="BCN4.png" alt="Light 4" onclick="toggleLight(4)">
-                    <button class="button" id="jump4">Wheeeeeeee</button>
-                </div>
-            </div>
-
+            <div class="light-row" id="lightRow"></div>
             <div class="controls">
                 <button class="button" onclick="toggleAndPlay()">Light Sequence and Video</button>
                 <button class="button" onclick="activateWhiteMode()">All Lights 50% White</button>
                 <button class="button" onclick="stopVideo()">Stop Video</button>
             </div>
-
             <div class="motion-container">
                 <div class="light-status" id="motionStatus">Motion Sensor: OFF</div>
                 <button class="button" onclick="toggleMotion()">Toggle Motion Sensor</button>
@@ -168,198 +137,107 @@
     </div>
 
     <script>
- const piIp = "https://api.marcosismotion.co.uk"; // ✅ Your secure API domain
-
-let jumpTimes = []; // ✅ Ensure this is defined globally
+const piIp = "https://api.marcosismotion.co.uk";
+let jumpTimes = [];
 
 function checkLogin() {
-    var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
     if (username === "admin" && password === "admin") {
         document.getElementById("loginOverlay").style.display = "none";
         document.getElementById("mainContent").classList.remove("blurred-background");
-
-        console.log("🚀 Logged in! Fetching jump times & updating statuses...");
-        fetchJumpTimes(); // ✅ Fetch jump times on login
-        updateAllStatuses(); // ✅ Update light statuses
+        fetchJumpTimes();
+        updateAllStatuses();
+        fetchThumbnailsAndLabels();
     } else {
         document.getElementById("errorMessage").style.display = "block";
     }
 }
 
-        function activateWhiteMode() {
-    console.log("🌟 Setting all lights to white at 50% brightness...");
-
-    fetch(`${piIp}/turn_all_lights_white`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error("❌ Failed to set lights to white mode:", data.error);
-            } else {
-                console.log("✅ All lights set to white at 50%:", data);
-                updateLightUI(null, false, true); // new flag for white ambient mode
-            }
-        })
-        .catch(error => console.error("❌ Error triggering white mode:", error));
-}
-
-// ✅ RESTORED: Original working jump time function
 function fetchJumpTimes() {
     fetch(`${piIp}/get_jump_times`)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            console.log("✅ Jump times fetched:", data);
-            jumpTimes = data.jump_times; // ✅ Store jump times
+            jumpTimes = data.jump_times || [];
             updateJumpButtons();
-        })
-        .catch(error => console.error("❌ Error fetching jump times:", error));
+        });
 }
 
-// ✅ RESTORED: Updating jump button functions properly
 function updateJumpButtons() {
-    if (jumpTimes.length < 4) {
-        console.error("❌ Not enough jump times to update buttons.");
-        return;
+    for (let i = 0; i < 4; i++) {
+        document.getElementById(`jump${i + 1}`).onclick = () => jumpToTime(jumpTimes[i], i + 1);
     }
+}
 
-    document.getElementById("jump1").onclick = function () { jumpToTime(jumpTimes[0], 1); };
-    document.getElementById("jump2").onclick = function () { jumpToTime(jumpTimes[1], 2); };
-    document.getElementById("jump3").onclick = function () { jumpToTime(jumpTimes[2], 3); };
-    document.getElementById("jump4").onclick = function () { jumpToTime(jumpTimes[3], 4); };
+function fetchThumbnailsAndLabels() {
+    fetch(`${piIp}/get_all_video_segments`)
+        .then(res => res.json())
+        .then(data => {
+            const segments = data.video_segments || [];
+            const row = document.getElementById("lightRow");
+            row.innerHTML = "";
+
+            for (let i = 1; i <= 4; i++) {
+                const video = segments[i]; // skip intro
+                const div = document.createElement("div");
+                div.className = "light-container";
+
+                const status = document.createElement("div");
+                status.className = "light-status";
+                status.id = `statusText${i}`;
+                status.textContent = `Light ${i}: OFF`;
+
+                const img = document.createElement("img");
+                img.id = `light${i}`;
+                img.className = "light-button light-off";
+                img.src = `${piIp}/api/thumbnail/${video.split("/").pop()}?t=${Date.now()}`;
+                img.alt = `Light ${i}`;
+                img.onerror = () => img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAIAAAD+48g2AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QETEBkN1uCUygAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAABFUlEQVR42u3RAQ0AAAjDMO5fNNSMewAAgPgqSgMgnUSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJOmbwAG+DCfDkEqVAAAAAElFTkSuQmCC";
+                img.onclick = () => toggleLight(i);
+
+                const btn = document.createElement("button");
+                btn.className = "button";
+                btn.id = `jump${i}`;
+                btn.textContent = video.split("/").pop();
+
+                div.appendChild(status);
+                div.appendChild(img);
+                div.appendChild(btn);
+                row.appendChild(div);
+            }
+        });
 }
 
 function jumpToTime(time, lightNumber) {
     fetch(`${piIp}/jump_to_time?time=${time}&light=${lightNumber}`)
-        .then(response => response.text())
-        .then(data => console.log("📡 Jump Response:", data))
-        .catch(error => console.error("❌ Error:", error));
+        .then(res => res.text())
+        .then(console.log);
 }
 
-function updateStatus(lightNumber) {
-    fetch(`${piIp}/status${lightNumber}`)
-        .then(response => response.text())
+function toggleLight(n) {
+    fetch(`${piIp}/toggle${n}`)
+        .then(res => res.json())
+        .then(data => updateStatus(n));
+}
+
+function updateStatus(n) {
+    fetch(`${piIp}/status${n}`)
+        .then(res => res.text())
         .then(status => {
-            document.getElementById(`statusText${lightNumber}`).innerText = `Light ${lightNumber}: ${status}`;
+            const img = document.getElementById(`light${n}`);
+            const label = document.getElementById(`statusText${n}`);
+            if (status === "ON") {
+                img.classList.remove("light-off");
+                img.classList.add("light-on");
+                label.textContent = `Light ${n}: ON`;
+            } else {
+                img.classList.remove("light-on");
+                img.classList.add("light-off");
+                label.textContent = `Light ${n}: OFF`;
+            }
         });
 }
-
-// ✅ Ensure lights start ON when page loads
-function updateAllStatuses() {
-    console.log("🔄 Updating all statuses...");
-
-    for (let i = 1; i <= 4; i++) {
-        fetch(`${piIp}/status${i}`)
-            .then(response => response.text())
-            .then(status => {
-                const lightImage = document.getElementById(`light${i}`);
-                const statusText = document.getElementById(`statusText${i}`);
-
-                if (status.trim() === "ON") {
-                    lightImage.classList.remove("light-off");
-                    lightImage.classList.add("light-on");
-                    statusText.innerText = `Light ${i}: ON`;
-                } else {
-                    lightImage.classList.remove("light-on");
-                    lightImage.classList.add("light-off");
-                    statusText.innerText = `Light ${i}: OFF`;
-                }
-            })
-            .catch(error => console.error(`❌ Error updating Light ${i} status:`, error));
-    }
-}
-
-// ✅ Run this when page loads
-document.addEventListener("DOMContentLoaded", function () {
-    updateAllStatuses();
-});
-
-function stopVideo() {
-    console.log("🛑 Stopping video and turning off all lights...");
-
-    fetch(`${piIp}/stop_video`)
-        .then(response => response.text())
-        .then(data => {
-            console.log("📡 Video stopped:", data);
-
-            // Turn off all lights
-            fetch(`${piIp}/turn_all_lights_white`)
-                .then(response => response.json())
-                .then(lightData => {
-                    console.log("💡 All lights turned OFF:", lightData);
-                    updateLightUI(null, true); // Update UI to reflect lights off
-                })
-                .catch(error => console.error("❌ Error turning lights off:", error));
-        })
-        .catch(error => console.error("❌ Error stopping video:", error));
-}
-
-function toggleLight(buttonNumber) {
-    console.log(`📡 Sending toggle request for Button ${buttonNumber}`);
-
-    // Map buttons to real lights (since you only have 2 lights)
-    const lightMapping = {
-        1: 1,  // Button 1 -> Light 1
-        2: 2,  // Button 2 -> Light 2
-        3: 1,  // Button 3 -> Light 1
-        4: 2   // Button 4 -> Light 2
-    };
-
-    // Define colors for each button
-    const lightColors = {
-        1: { r: 255, g: 140, b: 0 },   // Tiger Orange (Light 1)
-        2: { r: 178, g: 34, b: 34 },   // Phonebox Red (Light 2)
-        3: { r: 34, g: 139, b: 34 },   // Grass Green (Light 1)
-        4: { r: 135, g: 206, b: 235 }  // Sky Blue (Light 2)
-    };
-
-    let actualLight = lightMapping[buttonNumber]; // Map the button to the correct light
-    let color = lightColors[buttonNumber]; // Get the color
-
-    fetch(`${piIp}/toggle_light_color?light=${actualLight}&r=${color.r}&g=${color.g}&b=${color.b}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log(`✅ Light ${actualLight} (Button ${buttonNumber}) set to color:`, color, data);
-            updateLightUI(actualLight);
-        })
-        .catch(error => console.error(`❌ Error toggling Light ${actualLight}:`, error));
-}
-function toggleAndPlay() {
-    console.log("🎬 Starting timed light sequence and playing video...");
-
-    fetch(`${piIp}/toggle_and_play`)
-        .then(response => response.text())
-        .then(data => {
-            console.log("✅ Triggered:", data);
-        })
-        .catch(error => {
-            console.error("❌ Error triggering sequence:", error);
-        });
-}
-function updateLightUI(selectedButton = null, allOff = false, whiteMode = false) {
-    for (let button = 1; button <= 4; button++) {
-        let lightImage = document.getElementById(`light${button}`);
-        let statusText = document.getElementById(`statusText${button}`);
-
-        if (allOff) {
-            lightImage.classList.remove("light-on");
-            lightImage.classList.add("light-off");
-            statusText.innerText = `Light ${button}: OFF`;
-        } else if (whiteMode) {
-            lightImage.classList.remove("light-off");
-            lightImage.classList.add("light-on");
-            statusText.innerText = `Light ${button}: ON`;
-        } else if (button === selectedButton) {
-            lightImage.classList.remove("light-off");
-            lightImage.classList.add("light-on");
-            statusText.innerText = `Light ${button}: ON`;
-        }
-    }
-}
-
-// ✅ Immediately Fetch Jump Times on Page Load
-fetchJumpTimes();
-</script>
-
+    </script>
 </body>
 </html>
