@@ -112,7 +112,7 @@
 <body>
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
-            <h2>Login.</h2>
+            <h2>Login</h2>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <button onclick="checkLogin()">Login</button>
@@ -147,26 +147,9 @@ function checkLogin() {
     if (username === "admin" && password === "admin") {
         document.getElementById("loginOverlay").style.display = "none";
         document.getElementById("mainContent").classList.remove("blurred-background");
-        fetchJumpTimes();
-        updateAllStatuses();
-        fetchThumbnailsAndLabels();
+        fetchThumbnailsAndLabels(); // Now fetches thumbnails AND sets up jump buttons
     } else {
         document.getElementById("errorMessage").style.display = "block";
-    }
-}
-
-function fetchJumpTimes() {
-    fetch(`${piIp}/get_jump_times`)
-        .then(res => res.json())
-        .then(data => {
-            jumpTimes = data.jump_times || [];
-            updateJumpButtons();
-        });
-}
-
-function updateJumpButtons() {
-    for (let i = 0; i < 4; i++) {
-        document.getElementById(`jump${i + 1}`).onclick = () => jumpToTime(jumpTimes[i], i + 1);
     }
 }
 
@@ -178,34 +161,43 @@ function fetchThumbnailsAndLabels() {
             const row = document.getElementById("lightRow");
             row.innerHTML = "";
 
-            for (let i = 1; i <= 4; i++) {
-                const video = segments[i]; // skip intro
-                const div = document.createElement("div");
-                div.className = "light-container";
+            fetch(`${piIp}/get_jump_times`)
+                .then(res => res.json())
+                .then(jumpData => {
+                    jumpTimes = jumpData.jump_times || [];
 
-                const status = document.createElement("div");
-                status.className = "light-status";
-                status.id = `statusText${i}`;
-                status.textContent = `Light ${i}: OFF`;
+                    for (let i = 1; i <= 4; i++) {
+                        const video = segments[i]; // skip intro
+                        const div = document.createElement("div");
+                        div.className = "light-container";
 
-                const img = document.createElement("img");
-                img.id = `light${i}`;
-                img.className = "light-button light-off";
-                img.src = `${piIp}/api/thumbnail/${video.split("/").pop()}?t=${Date.now()}`;
-                img.alt = `Light ${i}`;
-                img.onerror = () => img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAIAAAD+48g2AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QETEBkN1uCUygAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAABFUlEQVR42u3RAQ0AAAjDMO5fNNSMewAAgPgqSgMgnUSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJOmbwAG+DCfDkEqVAAAAAElFTkSuQmCC";
-                img.onclick = () => toggleLight(i);
+                        const status = document.createElement("div");
+                        status.className = "light-status";
+                        status.id = `statusText${i}`;
+                        status.textContent = `Light ${i}: OFF`;
 
-                const btn = document.createElement("button");
-                btn.className = "button";
-                btn.id = `jump${i}`;
-                btn.textContent = video.split("/").pop();
+                        const img = document.createElement("img");
+                        img.id = `light${i}`;
+                        img.className = "light-button light-off";
+                        img.src = `${piIp}/api/thumbnail/${video.split("/").pop()}?t=${Date.now()}`;
+                        img.alt = `Light ${i}`;
+                        img.onerror = () => img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAIAAAD+48g2AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QETEBkN1uCUygAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAABFUlEQVR42u3RAQ0AAAjDMO5fNNSMewAAgPgqSgMgnUSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJOmbwAG+DCfDkEqVAAAAAElFTkSuQmCC";
+                        img.onclick = () => toggleLight(i);
 
-                div.appendChild(status);
-                div.appendChild(img);
-                div.appendChild(btn);
-                row.appendChild(div);
-            }
+                        const btn = document.createElement("button");
+                        btn.className = "button";
+                        btn.id = `jump${i}`;
+                        btn.textContent = video.split("/").pop();
+                        btn.onclick = () => jumpToTime(jumpTimes[i - 1], i); // Match correct index
+
+                        div.appendChild(status);
+                        div.appendChild(img);
+                        div.appendChild(btn);
+                        row.appendChild(div);
+                    }
+
+                    updateAllStatuses(); // 🔁 Once layout is ready
+                });
         });
 }
 
@@ -218,7 +210,7 @@ function jumpToTime(time, lightNumber) {
 function toggleLight(n) {
     fetch(`${piIp}/toggle${n}`)
         .then(res => res.json())
-        .then(data => updateStatus(n));
+        .then(() => updateStatus(n));
 }
 
 function updateStatus(n) {
@@ -238,6 +230,12 @@ function updateStatus(n) {
             }
         });
 }
-    </script>
+
+function updateAllStatuses() {
+    for (let i = 1; i <= 4; i++) {
+        updateStatus(i);
+    }
+}
+</script>
 </body>
 </html>
