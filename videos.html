@@ -88,8 +88,17 @@
         section.innerHTML = '';
 
         for (let i = 0; i < 5; i++) {
-          const block = document.createElement('div');
-          block.className = 'video-block';
+  const block = document.createElement('div');
+  block.className = 'video-block';
+
+  // 🏷️ Add "Intro" label above first block
+  if (i === 0) {
+    const introLabel = document.createElement('div');
+    introLabel.textContent = '🎬 Intro';
+    introLabel.style.fontWeight = 'bold';
+    introLabel.style.marginBottom = '4px';
+    block.appendChild(introLabel);
+  }
 
           const img = document.createElement('img');
           img.id = `preview${i}`;
@@ -156,6 +165,37 @@
     }
     selections.push(select.value);
   }
+      
+function toggleAndPlay() {
+    console.log("🎬 Starting sequence...");
+    fetch(`${piIp}/toggle_and_play`)
+        .then(res => res.text())
+        .then(data => console.log("✅ Triggered:", data))
+        .catch(err => console.error("❌ Sequence error:", err));
+}
+
+function activateWhiteMode() {
+    console.log("🌟 Setting all lights to white...");
+    fetch(`${piIp}/turn_all_lights_white`)
+        .then(res => res.json())
+        .then(data => {
+            console.log("✅ Lights set:", data);
+            updateAllStatuses(); // Optional refresh
+        })
+        .catch(err => console.error("❌ White mode error:", err));
+}
+
+function stopVideo() {
+    console.log("🛑 Stopping video...");
+    fetch(`${piIp}/stop_video`)
+        .then(res => res.text())
+        .then(data => {
+            console.log("✅ Video stopped:", data);
+            activateWhiteMode(); // Auto fade-in after stop
+        })
+        .catch(err => console.error("❌ Stop error:", err));
+}
+      
 
   try {
     const res = await fetch(`${apiBaseUrl}/save_config`, {
