@@ -11,6 +11,9 @@
     .video-block { display: flex; flex-direction: column; align-items: center; width: 180px; }
     .video-block img { max-width: 100%; height: auto; border: 1px solid #ccc; margin-bottom: 5px; }
     button { padding: 8px 12px; margin-top: 10px; font-size: 16px; }
+    .video-block div:first-child {
+  min-height: 22px;
+}
   </style>
 </head>
 <body>
@@ -91,13 +94,13 @@
   const block = document.createElement('div');
   block.className = 'video-block';
 
-  // 🏷️ Add "Intro" label above first block
-  if (i === 0) {
-    const introLabel = document.createElement('div');
-    introLabel.textContent = '🎬 Intro';
-    introLabel.style.fontWeight = 'bold';
-    introLabel.style.marginBottom = '4px';
-    block.appendChild(introLabel);
+  // ⬇️ Always add a label div for consistent height
+  const label = document.createElement('div');
+  label.style.height = '22px'; // Adjust for alignment
+  label.style.fontWeight = 'bold';
+  label.style.marginBottom = '4px';
+  label.innerText = i === 0 ? '🎬 Intro' : '';
+  block.appendChild(label);
   }
 
           const img = document.createElement('img');
