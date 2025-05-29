@@ -90,39 +90,37 @@
         const section = document.getElementById('videoSelectorSection');
         section.innerHTML = '';
 
-        for (let i = 0; i < 5; i++) {
+       for (let i = 0; i < 5; i++) {
   const block = document.createElement('div');
   block.className = 'video-block';
 
-  // ⬇️ Always add a label div for consistent height
   const label = document.createElement('div');
-  label.style.height = '22px'; // Adjust for alignment
+  label.style.height = '22px';
   label.style.fontWeight = 'bold';
   label.style.marginBottom = '4px';
   label.innerText = i === 0 ? '🎬 Intro' : '';
   block.appendChild(label);
-  }
 
-          const img = document.createElement('img');
-          img.id = `preview${i}`;
-          img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='; // transparent 1x1 gif
-          img.alt = 'Select a video';
+  const img = document.createElement('img');
+  img.id = `preview${i}`;
+  img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+  img.alt = 'Select a video';
 
-          const select = document.createElement('select');
-          select.id = `dropdown${i}`;
-          select.innerHTML = '<option disabled selected>Select a video</option>' +
-            videos.map(v => `<option value="${v}">${v}</option>`).join('');
+  const select = document.createElement('select');
+  select.id = `dropdown${i}`;
+  select.innerHTML = '<option disabled selected>Select a video</option>' +
+    videos.map(v => `<option value="${v}">${v}</option>`).join('');
 
-          select.addEventListener('change', () => {
-            const selected = select.value;
-            img.src = `${apiBaseUrl}/thumbnail/${encodeURIComponent(selected)}?t=${Date.now()}`;
-            updateDropdownOptions();
-          });
+  select.addEventListener('change', () => {
+    const selected = select.value;
+    img.src = `${apiBaseUrl}/thumbnail/${encodeURIComponent(selected)}?t=${Date.now()}`;
+    updateDropdownOptions();
+  });
 
-          block.appendChild(img);
-          block.appendChild(select);
-          section.appendChild(block);
-        }
+  block.appendChild(img);
+  block.appendChild(select);
+  section.appendChild(block);
+}
 
         updateDropdownOptions();
       } catch (error) {
