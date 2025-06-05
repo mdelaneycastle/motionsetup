@@ -11,9 +11,8 @@
     .video-block { display: flex; flex-direction: column; align-items: center; width: 180px; }
     .video-block img { max-width: 100%; height: auto; border: 1px solid #ccc; margin-bottom: 5px; }
     button { padding: 8px 12px; margin-top: 10px; font-size: 16px; }
-    .video-block div:first-child {
-  min-height: 22px;
-}
+    #saveMessage { color: green; margin-top: 10px; display: none; }
+    .video-block div:first-child { min-height: 22px; }
   </style>
 </head>
 <body>
@@ -32,11 +31,11 @@
   <div class="video-section" id="videoSelectorSection"></div>
 
   <button onclick="saveSelection()">Save Selection</button>
+  <p id="saveMessage">✅ Configuration saved successfully!</p>
 
   <script>
     const apiBaseUrl = 'https://videos.marcosismotion.co.uk/api';
     let allVideos = [];
-    const UPLOAD_FOLDER = '/home/admin/videos/';
 
     function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
@@ -90,37 +89,37 @@
         const section = document.getElementById('videoSelectorSection');
         section.innerHTML = '';
 
-       for (let i = 0; i < 5; i++) {
-  const block = document.createElement('div');
-  block.className = 'video-block';
+        for (let i = 0; i < 5; i++) {
+          const block = document.createElement('div');
+          block.className = 'video-block';
 
-  const label = document.createElement('div');
-  label.style.height = '22px';
-  label.style.fontWeight = 'bold';
-  label.style.marginBottom = '4px';
-  label.innerText = i === 0 ? '🎬 Intro' : '';
-  block.appendChild(label);
+          const label = document.createElement('div');
+          label.style.height = '22px';
+          label.style.fontWeight = 'bold';
+          label.style.marginBottom = '4px';
+          label.innerText = i === 0 ? '🎬 Intro' : '';
+          block.appendChild(label);
 
-  const img = document.createElement('img');
-  img.id = `preview${i}`;
-  img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-  img.alt = 'Select a video';
+          const img = document.createElement('img');
+          img.id = `preview${i}`;
+          img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+          img.alt = 'Select a video';
 
-  const select = document.createElement('select');
-  select.id = `dropdown${i}`;
-  select.innerHTML = '<option disabled selected>Select a video</option>' +
-    videos.map(v => `<option value="${v}">${v}</option>`).join('');
+          const select = document.createElement('select');
+          select.id = `dropdown${i}`;
+          select.innerHTML = '<option disabled selected>Select a video</option>' +
+            videos.map(v => `<option value="${v}">${v}</option>`).join('');
 
-  select.addEventListener('change', () => {
-    const selected = select.value;
-    img.src = `${apiBaseUrl}/thumbnail/${encodeURIComponent(selected)}?t=${Date.now()}`;
-    updateDropdownOptions();
-  });
+          select.addEventListener('change', () => {
+            const selected = select.value;
+            img.src = `${apiBaseUrl}/thumbnail/${encodeURIComponent(selected)}?t=${Date.now()}`;
+            updateDropdownOptions();
+          });
 
-  block.appendChild(img);
-  block.appendChild(select);
-  section.appendChild(block);
-}
+          block.appendChild(img);
+          block.appendChild(select);
+          section.appendChild(block);
+        }
 
         updateDropdownOptions();
       } catch (error) {
@@ -147,75 +146,38 @@
       }
     }
 
-    async function getDuration(filename) {
-      const video = document.createElement("video");
-      video.src = `${apiBaseUrl}/videos/${encodeURIComponent(filename)}`;
-      return new Promise(resolve => {
-        video.onloadedmetadata = () => resolve(Math.floor(video.duration));
-        video.onerror = () => resolve(0);
-      });
-    }
-
     async function saveSelection() {
-  const selections = [];
-  for (let i = 0; i < 5; i++) {
-    const select = document.getElementById(`dropdown${i}`);
-    if (!select || !select.value) {
-      alert("⚠️ Please make all 5 selections.");
-      return;
+      const selections = [];
+      for (let i = 0; i < 5; i++) {
+        const select = document.getElementById(`dropdown${i}`);
+        if (!select || !select.value) {
+          alert("⚠️ Please make all 5 selections.");
+          return;
+        }
+        selections.push(select.value);
+      }
+
+      try {
+        const res = await fetch(`${apiBaseUrl}/save_config`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videos: selections })
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          document.getElementById("saveMessage").style.display = "block";
+          setTimeout(() => {
+            document.getElementById("saveMessage").style.display = "none";
+          }, 3000);
+        } else {
+          alert("❌ " + (result.error || "Failed to save configuration."));
+        }
+      } catch (err) {
+        console.error("❌ Save error:", err);
+        alert("❌ Could not save. Check console for details.");
+      }
     }
-    selections.push(select.value);
-  }
-      
-function toggleAndPlay() {
-    console.log("🎬 Starting sequence...");
-    fetch(`${piIp}/toggle_and_play`)
-        .then(res => res.text())
-        .then(data => console.log("✅ Triggered:", data))
-        .catch(err => console.error("❌ Sequence error:", err));
-}
-
-function activateWhiteMode() {
-    console.log("🌟 Setting all lights to white...");
-    fetch(`${piIp}/turn_all_lights_white`)
-        .then(res => res.json())
-        .then(data => {
-            console.log("✅ Lights set:", data);
-            updateAllStatuses(); // Optional refresh
-        })
-        .catch(err => console.error("❌ White mode error:", err));
-}
-
-function stopVideo() {
-    console.log("🛑 Stopping video...");
-    fetch(`${piIp}/stop_video`)
-        .then(res => res.text())
-        .then(data => {
-            console.log("✅ Video stopped:", data);
-            activateWhiteMode(); // Auto fade-in after stop
-        })
-        .catch(err => console.error("❌ Stop error:", err));
-}
-      
-
-  try {
-    const res = await fetch(`${apiBaseUrl}/save_config`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ videos: selections })
-    });
-
-    const result = await res.json();
-    if (res.ok) {
-      alert("✅ " + result.message);
-    } else {
-      alert("❌ " + (result.error || "Failed to save configuration."));
-    }
-  } catch (err) {
-    console.error("❌ Save error:", err);
-    alert("❌ Could not save. Check console for details.");
-  }
-}
 
     loadVideoList();
   </script>
